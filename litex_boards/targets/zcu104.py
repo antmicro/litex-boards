@@ -18,7 +18,8 @@ from litex.soc.integration.builder import *
 from litex.soc.cores.led import LedChaser
 from litex.soc.cores.bitbang import I2CMaster
 
-from litedram.modules import MTA4ATF51264HZ
+from litedram import modules as litedram_modules
+from litedram.modules import SDRAMModule, parse_spd_hexdump
 from litedram.phy import usddrphy
 
 # CRG ----------------------------------------------------------------------------------------------
@@ -51,7 +52,8 @@ class _CRG(Module):
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq=int(125e6), **kwargs):
+    def __init__(self, sys_clk_freq=int(125e6), sdram_module_cls="MTA4ATF51264HZ", spd_data=None,
+                 **kwargs):
         platform = zcu104.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -68,9 +70,13 @@ class BaseSoC(SoCCore):
                 iodelay_clk_freq = 500e6,
                 cmd_latency      = 1)
             self.add_csr("ddrphy")
+            if spd_data:
+                module = SDRAMModule.from_spd_data(spd_data, sys_clk_freq)
+            else:
+                module = getattr(litedram_modules, sdram_module_cls)(sys_clk_freq, "1:4")
             self.add_sdram("sdram",
                 phy                     = self.ddrphy,
-                module                  = MTA4ATF51264HZ(sys_clk_freq, "1:4"),
+                module                  = module,
                 origin                  = self.mem_map["main_ram"],
                 size                    = kwargs.get("max_sdram_size", 0x40000000),
                 l2_cache_size           = kwargs.get("l2_size", 8192),
@@ -93,11 +99,19 @@ def main():
     parser = argparse.ArgumentParser(description="LiteX SoC on ZCU104")
     parser.add_argument("--build", action="store_true", help="Build bitstream")
     parser.add_argument("--load",  action="store_true", help="Load bitstream")
+    parser.add_argument("--sdram-spd-dump", help="Generate SDRAMModule parameters from SPD dump")
+    parser.add_argument("--sdram-module", choices=["MTA4ATF51264HZ", "KVR21SE15S84"],
+                        help="Use given SDRAM module")
     builder_args(parser)
     soc_sdram_args(parser)
     args = parser.parse_args()
 
-    soc = BaseSoC(**soc_sdram_argdict(args))
+    kwargs = soc_sdram_argdict(args)
+    if args.sdram_spd_dump:
+        kwargs["spd_data"] = parse_spd_hexdump(args.sdram_spd_dump)
+    if args.sdram_module:
+        kwargs["sdram_module_cls"] = args.sdram_module
+    soc = BaseSoC(**kwargs)
     builder = Builder(soc, **builder_argdict(args))
     builder.build(run=args.build)
 
