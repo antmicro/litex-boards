@@ -26,7 +26,7 @@ _io = [
     ),
 
     # DDR3 SDRAM (voltage changed from 1.5V to 1.35V)
-   ("ddram", 0,
+    ("ddram", 0,
         Subsignal("a", Pins(
             "M2 M5 M3 M1 L6 P1 N3 N2",
             "M6 R1 L5 N5 N4 P2 P6"),
@@ -74,16 +74,16 @@ _io = [
         Subsignal("tx_data", Pins("G20 H20 H22 J21"), IOStandard("LVCMOS33")),
     ),
 
-    # # PCIe
-    # ("pcie_x1", 0,
-    #     # Subsignal("rst_n", Pins(""), IOStandard("LVCMOS33")),
-    #     Subsignal("clk_p", Pins("F6")),
-    #     Subsignal("clk_n", Pins("E6")),
-    #     Subsignal("rx_p",  Pins("B8")),
-    #     Subsignal("rx_n",  Pins("A8")),
-    #     Subsignal("tx_p",  Pins("B4")),
-    #     Subsignal("tx_n",  Pins("A4"))
-    # ),
+    # PCIe
+    ("pcie_x1", 0,
+        # Subsignal("rst_n", Pins(""), IOStandard("LVCMOS33")),
+        Subsignal("clk_p", Pins("F10")),
+        Subsignal("clk_n", Pins("E10")),
+        Subsignal("rx_p",  Pins("D11")),
+        Subsignal("rx_n",  Pins("C11")),
+        Subsignal("tx_p",  Pins("D5")),
+        Subsignal("tx_n",  Pins("C5"))
+    ),
 
     # USB ULPI
     ("ulpi_clock", 0, Pins("W19"), IOStandard("LVCMOS33")), #

@@ -30,7 +30,6 @@ class _CRG(Module):
         self.clock_domains.cd_sys4x     = ClockDomain(reset_less=True)
         self.clock_domains.cd_sys4x_dqs = ClockDomain(reset_less=True)
         self.clock_domains.cd_idelay    = ClockDomain()
-        self.clock_domains.cd_eth       = ClockDomain()
 
         self.clock_domains.cd_ulpi0     = ClockDomain()
         self.clock_domains.cd_ulpi1     = ClockDomain()
@@ -93,12 +92,12 @@ class BaseSoC(SoCCore):
         self.add_ethernet(phy=self.ethphy)
         # self.add_etherbone(phy=self.ethphy)
 
-        # # PCIe -------------------------------------------------------------------------------------
-        # self.submodules.pcie_phy = S7PCIEPHY(platform, platform.request("pcie_x1"),
-        #     data_width = 128,
-        #     bar0_size  = 0x20000)
-        # self.add_csr("pcie_phy")
-        # self.add_pcie(phy=self.pcie_phy, ndmas=1)
+        # PCIe -------------------------------------------------------------------------------------
+        self.submodules.pcie_phy = S7PCIEPHY(platform, platform.request("pcie_x1"),
+            data_width = 128,
+            bar0_size  = 0x20000)
+        self.add_csr("pcie_phy")
+        self.add_pcie(phy=self.pcie_phy, ndmas=1)
 
         # Leds -------------------------------------------------------------------------------------
         self.submodules.leds = LedChaser(
