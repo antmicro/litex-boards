@@ -6,7 +6,7 @@ from litex.build.openocd import OpenOCD
 
 _io = [
     # Clk / Rst
-    ("clk100", 0, Pins("E19"), IOStandard("LVCMOS33")),
+    ("clk100", 0, Pins("C18"), IOStandard("LVCMOS33")),
 
     # Leds
     ("user_led", 0, Pins("B22"),  IOStandard("LVCMOS33")),
