@@ -77,12 +77,12 @@ _io = [
     # PCIe
     ("pcie_x1", 0,
         # Subsignal("rst_n", Pins(""), IOStandard("LVCMOS33")),
-        Subsignal("clk_p", Pins("F10")),
-        Subsignal("clk_n", Pins("E10")),
-        Subsignal("rx_p",  Pins("D11")),
-        Subsignal("rx_n",  Pins("C11")),
-        Subsignal("tx_p",  Pins("D5")),
-        Subsignal("tx_n",  Pins("C5"))
+        Subsignal("clk_p", Pins("F6")),
+        Subsignal("clk_n", Pins("E6")),
+        Subsignal("rx_p",  Pins("B8")),
+        Subsignal("rx_n",  Pins("A8")),
+        Subsignal("tx_p",  Pins("B4")),
+        Subsignal("tx_n",  Pins("A4"))
     ),
 
     # USB ULPI
