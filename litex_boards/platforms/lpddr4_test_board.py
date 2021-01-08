@@ -5,7 +5,8 @@ from litex.build.openocd import OpenOCD
 # IOs ----------------------------------------------------------------------------------------------
 
 _io = [
-    ("clk100", 0, Pins("E21"), IOStandard("LVCMOS33")),
+    # ("clk100", 0, Pins("E21"), IOStandard("LVCMOS33")),
+    ("clk100", 0, Pins("L19"), IOStandard("LVCMOS33")),
 
     ("user_led", 0, Pins("F8"),  IOStandard("LVCMOS33")),
     ("user_led", 1, Pins("C8"),  IOStandard("LVCMOS33")),
@@ -58,8 +59,10 @@ _io = [
     # Ethernet
     ("eth_ref_clk", 0, Pins("C12"), IOStandard("LVCMOS33")),
     ("eth_clocks", 0,
-        Subsignal("tx", Pins("B18")),
-        Subsignal("rx", Pins("B12")),
+        # Subsignal("tx", Pins("B18")),
+        # Subsignal("rx", Pins("B12")),
+        Subsignal("tx", Pins("E17")),
+        Subsignal("rx", Pins("C17")),
         IOStandard("LVCMOS33"),
     ),
     ("eth", 0,
