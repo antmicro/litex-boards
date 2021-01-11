@@ -35,8 +35,10 @@ _io = [
         Subsignal("clk_p", Pins("Y3"), IOStandard("DIFF_SSTL12")),
         Subsignal("clk_n", Pins("Y2"), IOStandard("DIFF_SSTL12")),
         Subsignal("cke",   Pins("N4"), IOStandard("SSTL12")),
-        Subsignal("odt",   Pins(""), IOStandard("SSTL12")),
-        Subsignal("reset_n", Pins(""), IOStandard("SSTL12")),
+        # FIXME: real pinouts
+        Subsignal("odt",   Pins("P5"), IOStandard("SSTL12")),
+        Subsignal("reset_n", Pins("W5"), IOStandard("SSTL12")),
+
         Subsignal("cs",  Pins("N3"), IOStandard("SSTL12")),
         Subsignal("ca", Pins(
             "L3 L4 AA4 AA3 AB3 AB2"),
@@ -44,14 +46,11 @@ _io = [
         Subsignal("dq", Pins(
             "L1 K2  K1  K3 R1 P2 P1 N2",
             "W2 Y1 AA1 AB1 R2 T1 T3 U1"),
-            IOStandard("SSTL12"),
-            Misc("IN_TERM=UNTUNED_SPLIT_40")),
+            IOStandard("SSTL12_T_DCI")),
         Subsignal("dqs_p", Pins("M2 U2"),
-            IOStandard("DIFF_SSTL12"),
-            Misc("IN_TERM=UNTUNED_SPLIT_40")),
+            IOStandard("DIFF_SSTL12")),
         Subsignal("dqs_n", Pins("M1 V2"),
-            IOStandard("DIFF_SSTL12"),
-            Misc("IN_TERM=UNTUNED_SPLIT_40")),
+            IOStandard("DIFF_SSTL12")),
         Subsignal("dmi", Pins("M3 W1"), IOStandard("SSTL12")),
         Misc("SLEW=FAST"),
     ),

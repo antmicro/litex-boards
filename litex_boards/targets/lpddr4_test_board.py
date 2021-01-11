@@ -14,8 +14,8 @@ from litex.soc.integration.soc_sdram import *
 from litex.soc.integration.builder import *
 from litex.soc.cores.led import LedChaser
 
-from litedram.modules import MT41K128M16
-from litedram.phy import s7ddrphy
+from litedram.modules import MT53E256M16D1
+from litedram.phy import s7lpddr4phy
 
 from liteeth.phy.mii import LiteEthPHYMII
 
@@ -26,8 +26,8 @@ from litehyperbus.core.hyperbus import HyperRAM
 class _CRG(Module):
     def __init__(self, platform, sys_clk_freq):
         self.clock_domains.cd_sys       = ClockDomain()
-        self.clock_domains.cd_sys4x     = ClockDomain(reset_less=True)
-        self.clock_domains.cd_sys4x_dqs = ClockDomain(reset_less=True)
+        self.clock_domains.cd_sys2x     = ClockDomain(reset_less=True)
+        self.clock_domains.cd_sys8x     = ClockDomain(reset_less=True)
         self.clock_domains.cd_idelay    = ClockDomain()
         self.clock_domains.cd_eth       = ClockDomain()
 
@@ -37,8 +37,9 @@ class _CRG(Module):
         # self.comb += pll.reset.eq(~platform.request("cpu_reset"))
         pll.register_clkin(platform.request("clk100"), 100e6)
         pll.create_clkout(self.cd_sys,       sys_clk_freq)
-        pll.create_clkout(self.cd_sys4x,     4*sys_clk_freq)
-        pll.create_clkout(self.cd_sys4x_dqs, 4*sys_clk_freq, phase=90)
+        pll.create_clkout(self.cd_sys2x,     2*sys_clk_freq)
+        pll.create_clkout(self.cd_sys8x,     8*sys_clk_freq)
+        # pll.create_clkout(self.cd_sys8x_dqs, 4*sys_clk_freq, phase=90)
         pll.create_clkout(self.cd_idelay,    200e6)
         pll.create_clkout(self.cd_eth,       25e6)
 
@@ -49,34 +50,35 @@ class _CRG(Module):
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq=int(100e6), **kwargs):
+    def __init__(self, **kwargs):
+        # sys_clk_freq = int(100e6)
+        sys_clk_freq = int(50e6)
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
+        kwargs['integrated_rom_size'] = 0x10000
         SoCCore.__init__(self, platform, sys_clk_freq,
             ident          = "LiteX SoC",
             ident_version  = True,
-            integrated_main_ram_size=0x10000,
             **kwargs)
 
         # CRG --------------------------------------------------------------------------------------
         self.submodules.crg = _CRG(platform, sys_clk_freq)
 
-        # # DDR3 SDRAM -------------------------------------------------------------------------------
-        # self.submodules.ddrphy = s7ddrphy.A7DDRPHY(platform.request("ddram"),
-        #     memtype        = "DDR3",
-        #     nphases        = 4,
-        #     sys_clk_freq   = sys_clk_freq)
-        # self.add_csr("ddrphy")
-        # self.add_sdram("sdram",
-        #     phy                     = self.ddrphy,
-        #     module                  = MT41K128M16(sys_clk_freq, "1:4"),
-        #     origin                  = self.mem_map["main_ram"],
-        #     size                    = kwargs.get("max_sdram_size", 0x40000000),
-        #     l2_cache_size           = kwargs.get("l2_size", 8192),
-        #     l2_cache_min_data_width = kwargs.get("min_l2_data_width", 128),
-        #     l2_cache_reverse        = True
-        # )
+        # LDDR4 SDRAM ------------------------------------------------------------------------------
+        self.submodules.ddrphy = s7lpddr4phy.S7LPDDR4PHY(platform.request("lpddr4"),
+            iodelay_clk_freq = 200e6,
+            sys_clk_freq   = sys_clk_freq)
+        self.add_csr("ddrphy")
+        self.add_sdram("sdram",
+            phy                     = self.ddrphy,
+            module                  = MT53E256M16D1(sys_clk_freq, "1:8"),
+            origin                  = self.mem_map["main_ram"],
+            size                    = kwargs.get("max_sdram_size", 0x40000000),
+            l2_cache_size           = kwargs.get("l2_size", 8192),
+            l2_cache_min_data_width = kwargs.get("min_l2_data_width", 128),
+            l2_cache_reverse        = True
+        )
 
         # Ethernet / Etherbone ---------------------------------------------------------------------
         self.submodules.ethphy = LiteEthPHYMII(
