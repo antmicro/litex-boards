@@ -5,7 +5,6 @@ from litex.build.openocd import OpenOCD
 # IOs ----------------------------------------------------------------------------------------------
 
 _io = [
-    # ("clk100", 0, Pins("E21"), IOStandard("LVCMOS33")),
     ("clk100", 0, Pins("L19"), IOStandard("LVCMOS33")),
 
     ("user_led", 0, Pins("F8"),  IOStandard("LVCMOS33")),
@@ -35,13 +34,11 @@ _io = [
         Subsignal("clk_p", Pins("Y3"), IOStandard("DIFF_SSTL12")),
         Subsignal("clk_n", Pins("Y2"), IOStandard("DIFF_SSTL12")),
         Subsignal("cke",   Pins("N4"), IOStandard("SSTL12")),
-        # FIXME: real pinouts
-        Subsignal("odt",   Pins("P5"), IOStandard("SSTL12")),
-        Subsignal("reset_n", Pins("W5"), IOStandard("SSTL12")),
-
+        Subsignal("odt",   Pins("N5"), IOStandard("SSTL12")),
+        Subsignal("reset_n", Pins("P4"), IOStandard("SSTL12")),
         Subsignal("cs",  Pins("N3"), IOStandard("SSTL12")),
         Subsignal("ca", Pins(
-            "L3 L4 AA4 AA3 AB3 AB2"),
+            "L3 L5 AA4 AA3 AB3 AB2"),
             IOStandard("SSTL12")),
         Subsignal("dq", Pins(
             "L1 K2  K1  K3 R1 P2 P1 N2",
