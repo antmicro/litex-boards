@@ -52,28 +52,23 @@ _io = [
         Misc("SLEW=FAST"),
     ),
 
-    # Ethernet
-    ("eth_ref_clk", 0, Pins("C12"), IOStandard("LVCMOS33")),
+    # RGMII Ethernet
+    ("eth_ref_clk", 0, Pins("C12"), IOStandard("LVCMOS33")),  # 125 MHz if enabled?
     ("eth_clocks", 0,
-        # Subsignal("tx", Pins("B18")),
-        # Subsignal("rx", Pins("B12")),
         Subsignal("tx", Pins("E17")),
         Subsignal("rx", Pins("C17")),
-        IOStandard("LVCMOS33"),
+        IOStandard("LVCMOS33")
     ),
     ("eth", 0,
-        Subsignal("rst_n",   Pins("C15")),
-        Subsignal("mdio",    Pins("C13")),
-        Subsignal("mdc",     Pins("C14")),
-        Subsignal("rx_dv",   Pins("B13")),
-        Subsignal("rx_er",   Pins("A14")),
-        Subsignal("rx_data", Pins("A15 B16 A16 B17")),
-        Subsignal("tx_en",   Pins("A18")),
-        Subsignal("tx_data", Pins("A19 B20 A20 B21")),
-        Subsignal("col",     Pins("B15")),
-        Subsignal("crs",     Pins("A13")),
-        IOStandard("LVCMOS33"),
+        Subsignal("rst_n",   Pins("E16"), IOStandard("LVCMOS33")),
+        Subsignal("mdio",    Pins("C14"), IOStandard("LVCMOS33")),
+        Subsignal("mdc",     Pins("B17"), IOStandard("LVCMOS33")),
+        Subsignal("rx_ctl",  Pins("A16"), IOStandard("LVCMOS33")),
+        Subsignal("rx_data", Pins("B16 A15 B15 A14"), IOStandard("LVCMOS33")),
+        Subsignal("tx_ctl",  Pins("A13"), IOStandard("LVCMOS33")),
+        Subsignal("tx_data", Pins("B21 B20 A19 A18"), IOStandard("LVCMOS33")),
     ),
+
 
     # HyperRAM
     ("hyperram", 0,

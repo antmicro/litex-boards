@@ -17,7 +17,7 @@ from litex.soc.cores.led import LedChaser
 from litedram.modules import MT53E256M16D1
 from litedram.phy import s7lpddr4phy
 
-from liteeth.phy.mii import LiteEthPHYMII
+from liteeth.phy import LiteEthS7PHYRGMII
 
 from litehyperbus.core.hyperbus import HyperRAM
 
@@ -81,7 +81,7 @@ class BaseSoC(SoCCore):
         )
 
         # Ethernet / Etherbone ---------------------------------------------------------------------
-        self.submodules.ethphy = LiteEthPHYMII(
+        self.submodules.ethphy = LiteEthS7PHYRGMII(
             clock_pads = self.platform.request("eth_clocks"),
             pads       = self.platform.request("eth"))
         self.add_csr("ethphy")
