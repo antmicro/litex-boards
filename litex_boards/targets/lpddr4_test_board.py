@@ -15,7 +15,7 @@ from litex.soc.integration.builder import *
 from litex.soc.cores.led import LedChaser
 
 from litedram.modules import MT53E256M16D1
-from litedram.phy import s7lpddr4phy
+from litedram.phy.lpddr4 import S7LPDDR4PHY
 
 from liteeth.phy import LiteEthS7PHYRGMII
 
@@ -66,9 +66,9 @@ class BaseSoC(SoCCore):
         self.submodules.crg = _CRG(platform, sys_clk_freq)
 
         # LDDR4 SDRAM ------------------------------------------------------------------------------
-        self.submodules.ddrphy = s7lpddr4phy.S7LPDDR4PHY(platform.request("lpddr4"),
+        self.submodules.ddrphy = S7LPDDR4PHY(platform.request("lpddr4"),
             iodelay_clk_freq = 200e6,
-            sys_clk_freq   = sys_clk_freq)
+            sys_clk_freq     = sys_clk_freq)
         self.add_csr("ddrphy")
         self.add_sdram("sdram",
             phy                     = self.ddrphy,
