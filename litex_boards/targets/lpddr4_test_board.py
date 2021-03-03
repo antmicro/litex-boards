@@ -29,9 +29,10 @@ class _CRG(Module):
         if with_sdram:
             self.clock_domains.cd_sys2x     = ClockDomain(reset_less=True)
             self.clock_domains.cd_sys8x     = ClockDomain(reset_less=True)
-            self.clock_domains.cd_idelay    = ClockDomain()
         if with_ethernet:
             self.clock_domains.cd_eth       = ClockDomain()
+        if with_sdram or with_ethernet:
+            self.clock_domains.cd_idelay    = ClockDomain()
 
         # # #
 
@@ -43,11 +44,12 @@ class _CRG(Module):
             pll.create_clkout(self.cd_sys2x,     2*sys_clk_freq)
             pll.create_clkout(self.cd_sys8x,     8*sys_clk_freq)
             # pll.create_clkout(self.cd_sys8x_dqs, 4*sys_clk_freq, phase=90)
-            pll.create_clkout(self.cd_idelay,    200e6)
         if with_ethernet:
             pll.create_clkout(self.cd_eth,       25e6)
+        if with_sdram or with_ethernet:
+            pll.create_clkout(self.cd_idelay,    200e6)
 
-        if with_sdram:
+        if with_sdram or with_ethernet:
             self.submodules.idelayctrl = S7IDELAYCTRL(self.cd_idelay)
 
         if with_ethernet:
@@ -56,7 +58,7 @@ class _CRG(Module):
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_hyperram, **kwargs):
+    def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -67,7 +69,7 @@ class BaseSoC(SoCCore):
 
         # CRG --------------------------------------------------------------------------------------
         self.submodules.crg = _CRG(platform,
-            sys_clk_freq=sys_clk_freq, with_sdram=with_sdram, with_ethernet=with_ethernet)
+            sys_clk_freq=sys_clk_freq, with_sdram=with_sdram, with_ethernet=with_ethernet or with_etherbone)
 
         # LDDR4 SDRAM ------------------------------------------------------------------------------
         if with_sdram:
@@ -86,12 +88,16 @@ class BaseSoC(SoCCore):
             )
 
         # Ethernet / Etherbone ---------------------------------------------------------------------
-        if with_ethernet:
+        assert not (with_ethernet and with_etherbone)
+        if with_ethernet or with_etherbone:
             self.submodules.ethphy = LiteEthS7PHYRGMII(
                 clock_pads = self.platform.request("eth_clocks"),
                 pads       = self.platform.request("eth"))
             self.add_csr("ethphy")
-            self.add_ethernet(phy=self.ethphy)
+            if with_ethernet:
+                self.add_ethernet(phy=self.ethphy)
+            if with_etherbone:
+                self.add_etherbone(phy=self.ethphy)
 
         # HyperRAM ---------------------------------------------------------------------------------
         if with_hyperram:
@@ -116,6 +122,7 @@ def main():
     target.add_argument("--sys-clk-freq", default="100e6", help="System clock frequency")
     target.add_argument("--with-sdram", action="store_true", help="Add LPDDR4 PHY")
     target.add_argument("--with-ethernet", action="store_true", help="Add Ethernet PHY")
+    target.add_argument("--with-etherbone", action="store_true", help="Add EtherBone")
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
     builder_args(parser)
     soc_sdram_args(parser)
@@ -124,15 +131,16 @@ def main():
 
     soc_kwargs = soc_sdram_argdict(args)
     soc_kwargs['integrated_rom_size'] = 0x10000
-    if not args.with_sdram and args.with_ethernet:
-        # 1 MB just to satisfy BIOS requireing MAIN_RAM_BASE
-        soc_kwargs["integrated_main_ram_size"] = 0x100000
+    if not args.with_sdram and (args.with_ethernet or args.with_etherbone):
+        # 100k to satisfy BIOS requiring MAIN_RAM_BASE
+        soc_kwargs["integrated_main_ram_size"] = 0x10000
 
     soc = BaseSoC(
-        sys_clk_freq  = int(float(args.sys_clk_freq)),
-        with_sdram    = args.with_sdram,
-        with_ethernet = args.with_ethernet,
-        with_hyperram = args.with_hyperram,
+        sys_clk_freq   = int(float(args.sys_clk_freq)),
+        with_sdram     = args.with_sdram,
+        with_ethernet  = args.with_ethernet,
+        with_etherbone = args.with_etherbone,
+        with_hyperram  = args.with_hyperram,
         **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
     builder.build(**vivado_build_argdict(args), run=args.build)
