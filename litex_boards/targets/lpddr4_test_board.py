@@ -29,8 +29,6 @@ class _CRG(Module):
         if with_sdram:
             self.clock_domains.cd_sys2x     = ClockDomain(reset_less=True)
             self.clock_domains.cd_sys8x     = ClockDomain(reset_less=True)
-        if with_ethernet:
-            self.clock_domains.cd_eth       = ClockDomain()
         if with_sdram or with_ethernet:
             self.clock_domains.cd_idelay    = ClockDomain()
 
@@ -44,16 +42,11 @@ class _CRG(Module):
             pll.create_clkout(self.cd_sys2x,     2*sys_clk_freq)
             pll.create_clkout(self.cd_sys8x,     8*sys_clk_freq)
             # pll.create_clkout(self.cd_sys8x_dqs, 4*sys_clk_freq, phase=90)
-        if with_ethernet:
-            pll.create_clkout(self.cd_eth,       25e6)
         if with_sdram or with_ethernet:
             pll.create_clkout(self.cd_idelay,    200e6)
 
         if with_sdram or with_ethernet:
             self.submodules.idelayctrl = S7IDELAYCTRL(self.cd_idelay)
-
-        if with_ethernet:
-            self.comb += platform.request("eth_ref_clk").eq(self.cd_eth.clk)
 
 # BaseSoC ------------------------------------------------------------------------------------------
 
