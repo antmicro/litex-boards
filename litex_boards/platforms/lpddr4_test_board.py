@@ -1,6 +1,6 @@
 from litex.build.generic_platform import *
 from litex.build.xilinx import XilinxPlatform
-from litex.build.openocd import OpenOCD
+from litex.build.xilinx.programmer import XC3SProg
 
 # IOs ----------------------------------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ class Platform(XilinxPlatform):
         self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 34]")  # TODO: external verf?
 
     def create_programmer(self):
-        raise NotImplementedError()
+        return XC3SProg(cable="ft4232h")
 
     def do_finalize(self, fragment):
         XilinxPlatform.do_finalize(self, fragment)
