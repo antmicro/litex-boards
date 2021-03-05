@@ -51,7 +51,8 @@ class _CRG(Module):
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram, **kwargs):
+    def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram,
+            with_analyzer, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -105,6 +106,32 @@ class BaseSoC(SoCCore):
             sys_clk_freq = sys_clk_freq)
         self.add_csr("leds")
 
+        # LiteScope --------------------------------------------------------------------------------
+        if with_analyzer:
+            # host bridge on second serial, use:
+            #   litex_server --uart --uart-port /dev/ttyUSB3 --uart-baudrate 1e6
+            self.add_uartbone("serial", clk_freq=sys_clk_freq, baudrate=1e6, cd="sys")
+
+            signals = []
+            names_all = "cas_n cs_n ras_n we_n cke odt reset_n wrdata_en rddata_en rddata_valid"
+            names_0 = "address bank cas_n cs_n ras_n we_n cke odt reset_n wrdata_en wrdata rddata_en rddata rddata_valid"
+            for phase in self.ddrphy.dfi.phases[1:]:
+                for sig in names_all.split():
+                    signals.append(getattr(phase, sig))
+            for sig in names_0.split():
+                signals.append(getattr(self.ddrphy.dfi.p0, sig))
+
+            print("=" * 60)
+            print("LiteScope data_width = {}".format(sum(map(len, signals))))
+            print("=" * 60)
+
+            from litescope import LiteScopeAnalyzer
+            self.submodules.analyzer = LiteScopeAnalyzer(signals,
+               depth        = 512,
+               clock_domain = "sys",
+               csr_csv      = "analyzer.csv")
+            self.add_csr("analyzer")
+
 # Build --------------------------------------------------------------------------------------------
 
 def main():
@@ -117,6 +144,7 @@ def main():
     target.add_argument("--with-ethernet", action="store_true", help="Add Ethernet PHY")
     target.add_argument("--with-etherbone", action="store_true", help="Add EtherBone")
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
+    target.add_argument("--with-analyzer", action="store_true", help="Add LiteScope")
     builder_args(parser)
     soc_sdram_args(parser)
     vivado_build_args(parser)
@@ -134,6 +162,7 @@ def main():
         with_ethernet  = args.with_ethernet,
         with_etherbone = args.with_etherbone,
         with_hyperram  = args.with_hyperram,
+        with_analyzer  = args.with_analyzer,
         **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
     builder.build(**vivado_build_argdict(args), run=args.build)
