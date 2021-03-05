@@ -7,6 +7,7 @@ from migen import *
 
 from litex_boards.platforms import lpddr4_test_board
 from litex.build.xilinx.vivado import vivado_build_args, vivado_build_argdict
+from litex.soc.interconnect.csr import AutoCSR, CSRStorage, CSRStatus
 
 from litex.soc.cores.clock import *
 from litex.soc.integration.soc_core import *
@@ -16,6 +17,7 @@ from litex.soc.cores.led import LedChaser
 
 from litedram.modules import MT53E256M16D1
 from litedram.phy.lpddr4 import S7LPDDR4PHY
+from litedram.core.controller import ControllerSettings
 
 from liteeth.phy import LiteEthS7PHYRGMII
 
@@ -71,14 +73,24 @@ class BaseSoC(SoCCore):
                 iodelay_clk_freq = 200e6,
                 sys_clk_freq     = sys_clk_freq)
             self.add_csr("ddrphy")
+
+            class ControllerDynamicSettings(Module, AutoCSR):
+                def __init__(self):
+                    self.refresh = CSRStorage(reset=0, description="Enable/disable Refresh commands sending")
+            self.submodules.controller_settings = ControllerDynamicSettings()
+            self.add_csr("controller_settings")
+
+            controller_settings = ControllerSettings()
+            controller_settings.with_auto_precharge = False
+            controller_settings.with_refresh = self.controller_settings.refresh.storage
+
             self.add_sdram("sdram",
                 phy                     = self.ddrphy,
                 module                  = MT53E256M16D1(sys_clk_freq, "1:8"),
                 origin                  = self.mem_map["main_ram"],
                 size                    = kwargs.get("max_sdram_size", 0x40000000),
-                l2_cache_size           = kwargs.get("l2_size", 8192),
-                l2_cache_min_data_width = kwargs.get("min_l2_data_width", 128),
-                l2_cache_reverse        = True
+                l2_cache_size           = 0,
+                controller_settings     = controller_settings,
             )
 
         # Ethernet / Etherbone ---------------------------------------------------------------------
