@@ -54,7 +54,7 @@ class _CRG(Module):
 
 class BaseSoC(SoCCore):
     def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram,
-            with_analyzer, **kwargs):
+            with_analyzer, with_sdcard, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -144,6 +144,10 @@ class BaseSoC(SoCCore):
                csr_csv      = "analyzer.csv")
             self.add_csr("analyzer")
 
+        # SD Card ----------------------------------------------------------------------------------
+        if with_sdcard:
+            self.add_sdcard()
+
 # Build --------------------------------------------------------------------------------------------
 
 def main():
@@ -157,6 +161,7 @@ def main():
     target.add_argument("--with-etherbone", action="store_true", help="Add EtherBone")
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
     target.add_argument("--with-analyzer", action="store_true", help="Add LiteScope")
+    target.add_argument("--with-sdcard", action="store_true", help="Add SDCard")
     builder_args(parser)
     soc_sdram_args(parser)
     vivado_build_args(parser)
@@ -175,6 +180,7 @@ def main():
         with_etherbone = args.with_etherbone,
         with_hyperram  = args.with_hyperram,
         with_analyzer  = args.with_analyzer,
+        with_sdcard    = args.with_sdcard,
         **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
     builder.build(**vivado_build_argdict(args), run=args.build)

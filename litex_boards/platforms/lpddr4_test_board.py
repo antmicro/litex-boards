@@ -80,6 +80,15 @@ _io = [
         IOStandard("LVCMOS33")
     ),
 
+    # SD Card
+    ("sdcard", 0,
+        Subsignal("data", Pins("D20 D19 C22 D21"), Misc("PULLUP True")),
+        Subsignal("cmd",  Pins("C20"), Misc("PULLUP True")),
+        Subsignal("clk",  Pins("D22")),
+        Subsignal("cd",   Pins("B22")),
+        Misc("SLEW=FAST"),
+        IOStandard("LVCMOS33"),
+    ),
 ]
 
 # Platform -----------------------------------------------------------------------------------------
