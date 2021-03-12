@@ -54,13 +54,14 @@ class _CRG(Module):
 
 class BaseSoC(SoCCore):
     def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram,
-            with_analyzer, with_sdcard, **kwargs):
+            with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
         SoCCore.__init__(self, platform, sys_clk_freq,
-            ident          = "LiteX SoC",
-            ident_version  = True,
+            ident               = "LiteX SoC",
+            ident_version       = True,
+            integrated_rom_mode = 'rw' if rw_bios_mem else 'r',
             **kwargs)
 
         # CRG --------------------------------------------------------------------------------------
@@ -69,16 +70,20 @@ class BaseSoC(SoCCore):
 
         # LDDR4 SDRAM ------------------------------------------------------------------------------
         if with_sdram:
-            self.submodules.ddrphy = S7LPDDR4PHY(platform.request("lpddr4"),
-                iodelay_clk_freq = 200e6,
-                sys_clk_freq     = sys_clk_freq)
-            self.add_csr("ddrphy")
-
             class ControllerDynamicSettings(Module, AutoCSR):
                 def __init__(self):
                     self.refresh = CSRStorage(reset=0, description="Enable/disable Refresh commands sending")
+                    self.masked_write = CSRStorage(reset=int(with_masked_write), description="Switch between WRITE/MASKED-WRITE commands")
             self.submodules.controller_settings = ControllerDynamicSettings()
             self.add_csr("controller_settings")
+
+
+            self.submodules.ddrphy = S7LPDDR4PHY(platform.request("lpddr4"),
+                iodelay_clk_freq = 200e6,
+                sys_clk_freq     = sys_clk_freq,
+                masked_write     = self.controller_settings.masked_write.storage,
+            )
+            self.add_csr("ddrphy")
 
             controller_settings = ControllerSettings()
             controller_settings.with_auto_precharge = False
@@ -118,11 +123,15 @@ class BaseSoC(SoCCore):
             sys_clk_freq = sys_clk_freq)
         self.add_csr("leds")
 
-        # LiteScope --------------------------------------------------------------------------------
-        if with_analyzer:
+        # UartBone ---------------------------------------------------------------------------------
+        if with_uartbone:
             # host bridge on second serial, use:
             #   litex_server --uart --uart-port /dev/ttyUSB3 --uart-baudrate 1e6
             self.add_uartbone("serial", clk_freq=sys_clk_freq, baudrate=1e6, cd="sys")
+
+        # LiteScope --------------------------------------------------------------------------------
+        if with_analyzer:
+            assert with_uartbone
 
             signals = []
             names_all = "cas_n cs_n ras_n we_n cke odt reset_n wrdata_en rddata_en rddata_valid"
@@ -155,10 +164,14 @@ def main():
     target = parser.add_argument_group(title="Target options")
     target.add_argument("--build", action="store_true", help="Build bitstream")
     target.add_argument("--load",  action="store_true", help="Load bitstream")
+    target.add_argument("--load-bios",  action="store_true", help="Reload BIOS code on running target")
     target.add_argument("--sys-clk-freq", default="100e6", help="System clock frequency")
+    target.add_argument("--rw-bios-mem", action="store_true", help="Make BIOS memory writable")
     target.add_argument("--with-sdram", action="store_true", help="Add LPDDR4 PHY")
+    target.add_argument("--no-masked-write", action="store_true", help="Use LPDDR4 WRITE instead of MASKED-WRITE")
     target.add_argument("--with-ethernet", action="store_true", help="Add Ethernet PHY")
     target.add_argument("--with-etherbone", action="store_true", help="Add EtherBone")
+    target.add_argument("--with-uartbone", action="store_true", help="Add UartBone on 2nd serial")
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
     target.add_argument("--with-analyzer", action="store_true", help="Add LiteScope")
     target.add_argument("--with-sdcard", action="store_true", help="Add SDCard")
@@ -174,12 +187,15 @@ def main():
         soc_kwargs["integrated_main_ram_size"] = 0x10000
 
     soc = BaseSoC(
-        sys_clk_freq   = int(float(args.sys_clk_freq)),
-        with_sdram     = args.with_sdram,
-        with_ethernet  = args.with_ethernet,
-        with_etherbone = args.with_etherbone,
-        with_hyperram  = args.with_hyperram,
-        with_analyzer  = args.with_analyzer,
+        sys_clk_freq      = int(float(args.sys_clk_freq)),
+        with_sdram        = args.with_sdram,
+        with_masked_write = not args.no_masked_write,
+        with_ethernet     = args.with_ethernet,
+        with_etherbone    = args.with_etherbone,
+        with_uartbone     = args.with_uartbone,
+        with_hyperram     = args.with_hyperram,
+        with_analyzer     = args.with_analyzer,
+        rw_bios_mem       = args.rw_bios_mem,
         with_sdcard    = args.with_sdcard,
         **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
@@ -188,6 +204,32 @@ def main():
     if args.load:
         prog = soc.platform.create_programmer()
         prog.load_bitstream(os.path.join(builder.gateware_dir, soc.build_name + ".bit"))
+
+    if args.load_bios:
+        # FIXME: writing the memory during runtime may lead to unexpected behaviour,
+        # but currently it is not possible to hold the CPU in a reset state using ctrl_reset
+        assert args.rw_bios_mem, 'BIOS memory must be writible'
+
+        from litex import RemoteClient
+        wb = RemoteClient()
+        wb.open()
+
+        def memwrite(wb, data, *, base, burst=0xff):
+            for i in range(0, len(data), burst):
+                wb.write(base + 4 * i, data[i:i + burst])
+
+        from litex.soc.integration.common import get_mem_data
+        bios_bin = os.path.join(builder.software_dir, "bios", "bios.bin")
+        rom_data = get_mem_data(bios_bin, "little")
+        print(f"Loading BIOS from: {bios_bin} starting at 0x{wb.mems.rom.base:08x} ...")
+        memwrite(wb, rom_data, base=wb.mems.rom.base)
+        wb.read(wb.mems.rom.base)
+
+        # reboot CPU
+        print('Rebooting CPU')
+        wb.regs.ctrl_reset.write(1)
+
+        wb.close()
 
 if __name__ == "__main__":
     main()
