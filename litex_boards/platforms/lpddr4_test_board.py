@@ -48,7 +48,7 @@ _io = [
             IOStandard("DIFF_SSTL12")),
         Subsignal("dqs_n", Pins("M1 V2"),
             IOStandard("DIFF_SSTL12")),
-        Subsignal("dmi", Pins("M3 W1"), IOStandard("SSTL12")),
+        Subsignal("dmi", Pins("M3 W1"), IOStandard("SSTL12_T_DCI")),
         Misc("SLEW=FAST"),
     ),
 
