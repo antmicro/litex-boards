@@ -89,6 +89,23 @@ _io = [
         Misc("SLEW=FAST"),
         IOStandard("LVCMOS33"),
     ),
+
+    # HDMI Out
+    ("hdmi_out", 0,
+        Subsignal("clk_p", Pins("R21"), IOStandard("TMDS_33")),
+        Subsignal("clk_n", Pins("R22"), IOStandard("TMDS_33")),
+        Subsignal("data0_p", Pins("P21"), IOStandard("TMDS_33")),
+        Subsignal("data0_n", Pins("P22"), IOStandard("TMDS_33")),
+        Subsignal("data1_p", Pins("K21"), IOStandard("TMDS_33")),
+        Subsignal("data1_n", Pins("K22"), IOStandard("TMDS_33")),
+        Subsignal("data2_p", Pins("J21"), IOStandard("TMDS_33")),
+        Subsignal("data2_n", Pins("J22"), IOStandard("TMDS_33")),
+        # Pins not connected
+        #Subsignal("scl", Pins(""), IOStandard("LVCMOS33")),
+        #Subsignal("sda", Pins(""), IOStandard("LVCMOS33")),
+        #Subsignal("cec", Pins(""), IOStandard("LVCMOS33")),
+        #Subsignal("hdp", Pins(""), IOStandard("LVCMOS25")),
+    ),
 ]
 
 # Platform -----------------------------------------------------------------------------------------

@@ -23,6 +23,8 @@ from liteeth.phy import LiteEthS7PHYRGMII
 
 from litehyperbus.core.hyperbus import HyperRAM
 
+from litevideo.output import VideoOut
+
 # CRG ----------------------------------------------------------------------------------------------
 
 class _CRG(Module):
@@ -54,7 +56,7 @@ class _CRG(Module):
 
 class BaseSoC(SoCCore):
     def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram,
-            with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, **kwargs):
+            with_video, with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -141,6 +143,51 @@ class BaseSoC(SoCCore):
         # SD Card ----------------------------------------------------------------------------------
         if with_sdcard:
             self.add_sdcard()
+
+        # Video out --------------------------------------------------------------------------------
+        if with_video:
+
+            mode = "ycbcr422"
+            if mode == "ycbcr422":
+                dw = 16
+            elif mode == "rgb":
+                dw = 32
+            else:
+                raise SystemError("Unknown pixel mode.")
+
+            pix_freq = 148.50e6
+
+            hdmi_out0_pads = platform.request("hdmi_out")
+            hdmi_out0_dram_port = self.sdram.crossbar.get_port(
+                mode="read",
+                data_width=dw,
+                clock_domain="hdmi_out0_pix",
+                reverse=True,
+            )
+    
+            self.submodules.hdmi_out0 = VideoOut(
+                platform.device,
+                hdmi_out0_pads,
+                hdmi_out0_dram_port,
+                mode=mode,
+                fifo_depth=4096,
+            )
+    
+            self.platform.add_false_path_constraints(
+                self.crg.cd_sys.clk,
+                self.hdmi_out0.driver.clocking.cd_pix.clk)
+            self.platform.add_period_constraint(self.hdmi_out0.driver.clocking.cd_pix.clk, period_ns(1*pix_freq))
+            self.platform.add_period_constraint(self.hdmi_out0.driver.clocking.cd_pix5x.clk, period_ns(5*pix_freq))
+    
+            self.platform.add_false_path_constraints(
+                self.crg.cd_sys.clk,
+                self.hdmi_out0.driver.clocking.cd_pix.clk,
+                self.hdmi_out0.driver.clocking.cd_pix5x.clk)
+    
+            #for name, value in sorted(self.platform.hdmi_infos.items()):
+            #    self.add_constant(name, value)
+
+            self.add_csr("hdmi_out0")
 
         # Leds -------------------------------------------------------------------------------------
         self.submodules.leds = LedChaser(
@@ -277,6 +324,7 @@ def main():
     target.add_argument("--with-etherbone", action="store_true", help="Add EtherBone")
     target.add_argument("--with-uartbone", action="store_true", help="Add UartBone on 2nd serial")
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
+    target.add_argument("--with-video", action="store_true", help="Add LiteVideo")
     target.add_argument("--with-analyzer", action="store_true", help="Add LiteScope")
     target.add_argument("--with-sdcard", action="store_true", help="Add SDCard")
     target.add_argument("--gtkw-savefile", action="store_true", help="Generate GTKWave savefile")
@@ -299,6 +347,7 @@ def main():
         with_etherbone    = args.with_etherbone,
         with_uartbone     = args.with_uartbone,
         with_hyperram     = args.with_hyperram,
+        with_video        = args.with_video,
         with_analyzer     = args.with_analyzer,
         rw_bios_mem       = args.rw_bios_mem,
         with_sdcard       = args.with_sdcard,
