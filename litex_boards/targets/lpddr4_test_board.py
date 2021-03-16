@@ -53,8 +53,9 @@ class _CRG(Module):
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
+    mem_map = {**SoCCore.mem_map, **{"spiflash": 0x20000000}}
     def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram,
-            with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, **kwargs):
+            with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, with_flash, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -141,6 +142,11 @@ class BaseSoC(SoCCore):
         # SD Card ----------------------------------------------------------------------------------
         if with_sdcard:
             self.add_sdcard()
+
+        if with_flash:
+            self.add_spi_flash(dummy_cycles=platform.SPIFLASH_DUMMY_CYCLES)
+            self.add_constant("SPIFLASH_PAGE_SIZE", platform.SPIFLASH_PAGE_SIZE)
+            self.add_constant("SPIFLASH_SECTOR_SIZE", platform.SPIFLASH_SECTOR_SIZE)
 
         # Leds -------------------------------------------------------------------------------------
         self.submodules.leds = LedChaser(
@@ -278,6 +284,7 @@ def main():
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
     target.add_argument("--with-analyzer", action="store_true", help="Add LiteScope")
     target.add_argument("--with-sdcard", action="store_true", help="Add SDCard")
+    target.add_argument("--with-flash", action="store_true", help="Add SPI Flash")
     target.add_argument("--gtkw-savefile", action="store_true", help="Generate GTKWave savefile")
     builder_args(parser)
     soc_sdram_args(parser)
@@ -301,6 +308,7 @@ def main():
         with_analyzer     = args.with_analyzer,
         rw_bios_mem       = args.rw_bios_mem,
         with_sdcard       = args.with_sdcard,
+        with_flash        = args.with_flash,
         **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
     vns = builder.build(**vivado_build_argdict(args), run=args.build)

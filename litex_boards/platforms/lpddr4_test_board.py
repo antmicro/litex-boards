@@ -69,6 +69,13 @@ _io = [
         Subsignal("tx_data", Pins("B21 B20 A19 A18"), IOStandard("LVCMOS33")),
     ),
 
+    # QSPI Flash
+    ("spiflash4x", 0,
+        Subsignal("cs_n", Pins("L16")),
+        Subsignal("clk",  Pins("G7")),
+        Subsignal("dq",   Pins("F19 G18 H19 H18")),
+        IOStandard("LVCMOS33")
+    ),
 
     # HyperRAM
     ("hyperram", 0,
@@ -96,6 +103,9 @@ _io = [
 class Platform(XilinxPlatform):
     default_clk_name   = "clk100"
     default_clk_period = 1e9/100e6
+    SPIFLASH_PAGE_SIZE    = 256
+    SPIFLASH_SECTOR_SIZE  = 64*1024
+    SPIFLASH_DUMMY_CYCLES = 11
 
     def __init__(self, device="xc7k70tfbg484-1"):
         XilinxPlatform.__init__(self, device, _io, toolchain="vivado")
