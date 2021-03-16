@@ -89,14 +89,35 @@ class BaseSoC(SoCCore):
             controller_settings.with_auto_precharge = False
             controller_settings.with_refresh = self.controller_settings.refresh.storage
 
+            module = MT53E256M16D1(sys_clk_freq, "1:8")
             self.add_sdram("sdram",
                 phy                     = self.ddrphy,
-                module                  = MT53E256M16D1(sys_clk_freq, "1:8"),
+                module                  = module,
                 origin                  = self.mem_map["main_ram"],
                 size                    = kwargs.get("max_sdram_size", 0x40000000),
                 l2_cache_size           = 0,
                 controller_settings     = controller_settings,
             )
+
+            # Debug info ---------------------------------------------------------------------------
+            def dump(obj):
+                print()
+                print(" " + obj.__class__.__name__)
+                print(" " + "-" * len(obj.__class__.__name__))
+                d = obj if isinstance(obj, dict) else vars(obj)
+                for var, val in d.items():
+                    if var == "self":
+                        continue
+                    if isinstance(val, Signal):
+                        val = "Signal(reset={})".format(val.reset.value)
+                    print("  {}: {}".format(var, val))
+
+            print("=" * 80)
+            dump(self.ddrphy.settings)
+            dump(module.geom_settings)
+            dump(module.timing_settings)
+            print()
+            print("=" * 80)
 
         # Ethernet / Etherbone ---------------------------------------------------------------------
         assert not (with_ethernet and with_etherbone)
