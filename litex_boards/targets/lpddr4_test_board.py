@@ -211,6 +211,54 @@ class BaseSoC(SoCCore):
                 csr_csv      = "analyzer.csv")
             self.add_csr("analyzer")
 
+            def savefile(soc, save):
+                from litex.build.sim import gtkwave as gtkw
+                # each phase in separate group
+                with save.gtkw.group("dfi phaseX", closed=True):
+                    for i, phase in enumerate(soc.ddrphy.dfi.phases):
+                        save.add(phase, group_name="dfi p{}".format(i), mappers=[
+                            gtkw.dfi_sorter(phases=False),
+                            gtkw.dfi_in_phase_colorer(),
+                        ])
+                # only dfi command signals
+                save.add(soc.ddrphy.dfi, group_name="dfi commands", mappers=[
+                    gtkw.regex_filter(gtkw.suffixes2re(["cas_n", "ras_n", "we_n"])),
+                    gtkw.dfi_sorter(),
+                    gtkw.dfi_per_phase_colorer(),
+                ])
+                # serialization
+                with save.gtkw.group("serialization", closed=True):
+                    ser_groups = [("out 1x", soc.ddrphy._out), ("out 2x", soc.ddrphy.out)]
+                    for name, out in ser_groups:
+                        save.group([out.cs, *out.ca, *out.dq_o, out.dq_oe, *out.dmi_o, *out.dqs_o, out.dqs_oe],
+                            group_name = name,
+                            mappers = [
+                                gtkw.regex_colorer({
+                                    "green": gtkw.suffixes2re(["cs\d*"]),
+                                    "yellow": gtkw.suffixes2re(["ca\d*", "dqs_o\d+"]),
+                                    "orange": ["dq_o\d+", "dmi_o\d+"],
+                                    "red": gtkw.suffixes2re(["oe\d*"]),
+                                })
+                            ]
+                        )
+                with save.gtkw.group("deserialization", closed=True):
+                    ser_groups = [("in 2x", soc.ddrphy.out), ("in 1x", soc.ddrphy._out)]
+                    for name, out in ser_groups:
+                        save.group([*out.dq_i, out.dq_oe, *out.dqs_i, out.dqs_oe],
+                            group_name = name,
+                            mappers = [gtkw.regex_colorer({
+                                "yellow": ["dqs_i"],
+                                "orange": ["dq_i"],
+                                "red": gtkw.suffixes2re(["oe\d*"]),
+                            })]
+                        )
+                save.add(soc.ddrphy.dfi, group_name="dfi rddata", mappers=[
+                    gtkw.regex_filter(gtkw.suffixes2re(["rddata", "p0.*rddata_valid"])),
+                    gtkw.dfi_sorter(),
+                    gtkw.dfi_per_phase_colorer(),
+                ])
+
+            self.generate_gtkwave_savefile = savefile
 
 # Build --------------------------------------------------------------------------------------------
 
@@ -230,6 +278,7 @@ def main():
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
     target.add_argument("--with-analyzer", action="store_true", help="Add LiteScope")
     target.add_argument("--with-sdcard", action="store_true", help="Add SDCard")
+    target.add_argument("--gtkw-savefile", action="store_true", help="Generate GTKWave savefile")
     builder_args(parser)
     soc_sdram_args(parser)
     vivado_build_args(parser)
@@ -251,10 +300,16 @@ def main():
         with_hyperram     = args.with_hyperram,
         with_analyzer     = args.with_analyzer,
         rw_bios_mem       = args.rw_bios_mem,
-        with_sdcard    = args.with_sdcard,
+        with_sdcard       = args.with_sdcard,
         **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
-    builder.build(**vivado_build_argdict(args), run=args.build)
+    vns = builder.build(**vivado_build_argdict(args), run=args.build)
+
+    if args.with_analyzer and args.gtkw_savefile:
+        from litex.build.sim import gtkwave as gtkw
+        savefile = os.path.join(builder.gateware_dir, "dump.gtkw")
+        with gtkw.GTKWSave(vns, savefile=savefile, dumpfile="dump.vcd", prefix="", treeopen=False) as save:
+            soc.generate_gtkwave_savefile(soc, save)
 
     if args.load:
         prog = soc.platform.create_programmer()
@@ -288,4 +343,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
