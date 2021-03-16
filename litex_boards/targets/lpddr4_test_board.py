@@ -138,6 +138,10 @@ class BaseSoC(SoCCore):
             self.add_wb_slave(hyperram_base, self.hyperram.bus)
             self.add_memory_region("hyperram", hyperram_base, 8*1024*1024)  # TODO: size?
 
+        # SD Card ----------------------------------------------------------------------------------
+        if with_sdcard:
+            self.add_sdcard()
+
         # Leds -------------------------------------------------------------------------------------
         self.submodules.leds = LedChaser(
             pads         = platform.request_all("user_led"),
@@ -174,9 +178,6 @@ class BaseSoC(SoCCore):
                csr_csv      = "analyzer.csv")
             self.add_csr("analyzer")
 
-        # SD Card ----------------------------------------------------------------------------------
-        if with_sdcard:
-            self.add_sdcard()
 
 # Build --------------------------------------------------------------------------------------------
 
