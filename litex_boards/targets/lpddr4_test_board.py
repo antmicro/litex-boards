@@ -159,13 +159,45 @@ class BaseSoC(SoCCore):
             assert with_uartbone
 
             signals = []
-            names_all = "cas_n cs_n ras_n we_n cke odt reset_n wrdata_en rddata_en rddata_valid"
-            names_0 = "address bank cas_n cs_n ras_n we_n cke odt reset_n wrdata_en wrdata rddata_en rddata rddata_valid"
-            for phase in self.ddrphy.dfi.phases[1:]:
-                for sig in names_all.split():
-                    signals.append(getattr(phase, sig))
-            for sig in names_0.split():
-                signals.append(getattr(self.ddrphy.dfi.p0, sig))
+            # sys clk
+            signals += [
+                self.ddrphy._out.clk,
+                self.ddrphy._out.cs,
+                *self.ddrphy._out.ca,
+                self.ddrphy._out.dq_o[0],
+                self.ddrphy._out.dq_i[0],
+                self.ddrphy._out.dq_oe,
+                self.ddrphy._out.dqs_o[0],
+                self.ddrphy._out.dqs_i[0],
+                self.ddrphy._out.dq_oe,
+                self.ddrphy._out.dqs_oe,
+                self.ddrphy._out.dmi_o[0],
+            ]
+            # sys2x clk
+            signals += [
+                self.ddrphy.out.clk,
+                self.ddrphy.out.cs,
+                *self.ddrphy.out.ca,
+                # self.ddrphy.out.dq_o[0],
+                *self.ddrphy.out.dq_o,
+                # self.ddrphy.out.dq_i[0],
+                *self.ddrphy.out.dq_i,
+                self.ddrphy.out.dqs_o[0],
+                self.ddrphy.out.dqs_i[0],
+                self.ddrphy.out.dq_oe,
+                self.ddrphy.out.dqs_oe,
+                self.ddrphy.out.dmi_o[0],
+            ]
+            # dfi
+            signals += [
+                *[p.rddata_en for p in self.ddrphy.dfi.phases],
+                *[p.rddata_valid for p in self.ddrphy.dfi.phases],
+                *[p.rddata for p in self.ddrphy.dfi.phases],
+                *[p.wrdata_en for p in self.ddrphy.dfi.phases],
+                *[p.cas_n for p in self.ddrphy.dfi.phases],
+                *[p.ras_n for p in self.ddrphy.dfi.phases],
+                *[p.we_n  for p in self.ddrphy.dfi.phases],
+            ]
 
             print("=" * 60)
             print("LiteScope data_width = {}".format(sum(map(len, signals))))
@@ -173,9 +205,10 @@ class BaseSoC(SoCCore):
 
             from litescope import LiteScopeAnalyzer
             self.submodules.analyzer = LiteScopeAnalyzer(signals,
-               depth        = 512,
-               clock_domain = "sys",
-               csr_csv      = "analyzer.csv")
+                depth        = 128,
+                # register     = 2,
+                clock_domain = "sys2x",
+                csr_csv      = "analyzer.csv")
             self.add_csr("analyzer")
 
 
