@@ -8,6 +8,7 @@
 from litex.build.generic_platform import *
 from litex.build.xilinx import XilinxPlatform
 from litex.build.openocd import OpenOCD
+from litex.build.xilinx.programmer import VivadoProgrammer
 
 # IOs ----------------------------------------------------------------------------------------------
 
@@ -320,7 +321,7 @@ class Platform(XilinxPlatform):
 
     def create_programmer(self):
         bscan_spi = "bscan_spi_xc7a100t.bit" if "xc7a100t" in self.device else "bscan_spi_xc7a35t.bit"
-        return OpenOCD("openocd_xc7_ft2232.cfg", bscan_spi)
+        return VivadoProgrammer(vivado_ver="2019.2", flash_part="s25fl128sxxxxxx0-spi-x1_x2_x4")
 
     def do_finalize(self, fragment):
         XilinxPlatform.do_finalize(self, fragment)

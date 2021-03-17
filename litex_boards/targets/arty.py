@@ -105,6 +105,7 @@ def main():
     parser = argparse.ArgumentParser(description="LiteX SoC on Arty A7")
     parser.add_argument("--build", action="store_true", help="Build bitstream")
     parser.add_argument("--load",  action="store_true", help="Load bitstream")
+    parser.add_argument("--flash",  action="store_true", help="Flash bitstream")
     builder_args(parser)
     soc_sdram_args(parser)
     vivado_build_args(parser)
@@ -129,6 +130,10 @@ def main():
     if args.load:
         prog = soc.platform.create_programmer()
         prog.load_bitstream(os.path.join(builder.gateware_dir, soc.build_name + ".bit"))
+
+    if args.flash:
+        prog = soc.platform.create_programmer()
+        prog.flash(0, os.path.join(builder.gateware_dir, soc.build_name + ".bin"))
 
 if __name__ == "__main__":
     main()
