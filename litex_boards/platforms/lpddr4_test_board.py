@@ -107,7 +107,7 @@ class Platform(XilinxPlatform):
         self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 34]")  # TODO: external verf?
 
     def create_programmer(self):
-        return XC3SProg(cable="ft4232h")
+        return XC3SProg(cable="ft4232h", flash_proxy_basename="bscan_spi_xc7k70t.bit")
 
     def do_finalize(self, fragment):
         XilinxPlatform.do_finalize(self, fragment)
