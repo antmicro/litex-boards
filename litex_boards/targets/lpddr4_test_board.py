@@ -72,7 +72,7 @@ class BaseSoC(SoCCore):
         if with_sdram:
             class ControllerDynamicSettings(Module, AutoCSR):
                 def __init__(self):
-                    self.refresh = CSRStorage(reset=0, description="Enable/disable Refresh commands sending")
+                    self.refresh = CSRStorage(reset=1, description="Enable/disable Refresh commands sending")
                     self.masked_write = CSRStorage(reset=int(with_masked_write), description="Switch between WRITE/MASKED-WRITE commands")
             self.submodules.controller_settings = ControllerDynamicSettings()
             self.add_csr("controller_settings")
