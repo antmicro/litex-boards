@@ -9,6 +9,7 @@ from litex_boards.platforms import lpddr4_test_board
 from litex.build.xilinx.vivado import vivado_build_args, vivado_build_argdict
 from litex.soc.interconnect.csr import AutoCSR, CSRStorage, CSRStatus
 
+from litex.soc.cores.clock.common import *
 from litex.soc.cores.clock import *
 from litex.soc.integration.soc_core import *
 from litex.soc.integration.soc_sdram import *
@@ -161,7 +162,7 @@ class BaseSoC(SoCCore):
             hdmi_out0_dram_port = self.sdram.crossbar.get_port(
                 mode="read",
                 data_width=dw,
-                clock_domain="hdmi_out0_pix",
+                clock_domain="sys",
                 reverse=True,
             )
     
