@@ -269,7 +269,7 @@ def main():
     target.add_argument("--load",  action="store_true", help="Load bitstream")
     target.add_argument("--load-bios",  action="store_true", help="Reload BIOS code on running target")
     target.add_argument("--flash",  action="store_true", help="Flash bitstream to QSPI flash configuration memory")
-    target.add_argument("--sys-clk-freq", default="35e6", help="System clock frequency")
+    target.add_argument("--sys-clk-freq", default="50e6", help="System clock frequency")
     target.add_argument("--rw-bios-mem", action="store_true", help="Make BIOS memory writable")
     target.add_argument("--with-sdram", action="store_true", help="Add LPDDR4 PHY")
     target.add_argument("--no-masked-write", action="store_true", help="Use LPDDR4 WRITE instead of MASKED-WRITE")
