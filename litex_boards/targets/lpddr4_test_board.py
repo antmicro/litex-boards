@@ -16,7 +16,7 @@ from litex.soc.integration.builder import *
 from litex.soc.cores.led import LedChaser
 
 from litedram.modules import MT53E256M16D1
-from litedram.phy.lpddr4 import S7LPDDR4PHY
+from litedram.phy.lpddr4 import A7LPDDR4PHY, K7LPDDR4PHY
 from litedram.core.controller import ControllerSettings
 
 from liteeth.phy import LiteEthS7PHYRGMII
@@ -26,11 +26,13 @@ from litehyperbus.core.hyperbus import HyperRAM
 # CRG ----------------------------------------------------------------------------------------------
 
 class _CRG(Module):
-    def __init__(self, platform, sys_clk_freq, with_sdram, with_ethernet):
+    def __init__(self, platform, sys_clk_freq, with_sdram, with_ethernet, with_sys8x_90):
         self.clock_domains.cd_sys       = ClockDomain()
         if with_sdram:
             self.clock_domains.cd_sys2x     = ClockDomain(reset_less=True)
             self.clock_domains.cd_sys8x     = ClockDomain(reset_less=True)
+            if with_sys8x_90:
+                self.clock_domains.cd_sys8x_90 = ClockDomain(reset_less=True)
         if with_sdram or with_ethernet:
             self.clock_domains.cd_idelay    = ClockDomain()
 
@@ -43,7 +45,8 @@ class _CRG(Module):
         if with_sdram:
             pll.create_clkout(self.cd_sys2x,     2*sys_clk_freq)
             pll.create_clkout(self.cd_sys8x,     8*sys_clk_freq)
-            # pll.create_clkout(self.cd_sys8x_dqs, 4*sys_clk_freq, phase=90)
+            if with_sys8x_90:
+                pll.create_clkout(self.cd_sys8x_90, 8*sys_clk_freq, phase=90)
         if with_sdram or with_ethernet:
             pll.create_clkout(self.cd_idelay,    200e6)
 
@@ -54,7 +57,8 @@ class _CRG(Module):
 
 class BaseSoC(SoCCore):
     def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram,
-            with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, **kwargs):
+            with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, with_odelay,
+            **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -65,8 +69,8 @@ class BaseSoC(SoCCore):
             **kwargs)
 
         # CRG --------------------------------------------------------------------------------------
-        self.submodules.crg = _CRG(platform,
-            sys_clk_freq=sys_clk_freq, with_sdram=with_sdram, with_ethernet=with_ethernet or with_etherbone)
+        self.submodules.crg = _CRG(platform, sys_clk_freq=sys_clk_freq, with_sdram=with_sdram,
+            with_ethernet=with_ethernet or with_etherbone, with_sys8x_90=not with_odelay)
 
         # LDDR4 SDRAM ------------------------------------------------------------------------------
         if with_sdram:
@@ -78,7 +82,8 @@ class BaseSoC(SoCCore):
             self.add_csr("controller_settings")
 
 
-            self.submodules.ddrphy = S7LPDDR4PHY(platform.request("lpddr4"),
+            phy_cls = K7LPDDR4PHY if with_odelay else A7LPDDR4PHY
+            self.submodules.ddrphy = phy_cls(platform.request("lpddr4"),
                 iodelay_clk_freq = 200e6,
                 sys_clk_freq     = sys_clk_freq,
                 masked_write     = self.controller_settings.masked_write.storage,
@@ -279,6 +284,7 @@ def main():
     target.add_argument("--with-hyperram", action="store_true", help="Add HyperRAM")
     target.add_argument("--with-analyzer", action="store_true", help="Add LiteScope")
     target.add_argument("--with-sdcard", action="store_true", help="Add SDCard")
+    target.add_argument("--no-odelay", action="store_true", help="Use PHY without ODELAY blocks")
     target.add_argument("--gtkw-savefile", action="store_true", help="Generate GTKWave savefile")
     builder_args(parser)
     soc_sdram_args(parser)
@@ -302,6 +308,7 @@ def main():
         with_analyzer     = args.with_analyzer,
         rw_bios_mem       = args.rw_bios_mem,
         with_sdcard       = args.with_sdcard,
+        with_odelay       = not args.no_odelay,
         **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
     vns = builder.build(**vivado_build_argdict(args), run=args.build)
