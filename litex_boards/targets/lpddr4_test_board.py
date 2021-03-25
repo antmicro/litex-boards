@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import os
+import sys
+import math
 import argparse
 
 from migen import *
@@ -280,6 +282,7 @@ def main():
     target.add_argument("--load",  action="store_true", help="Load bitstream")
     target.add_argument("--load-bios",  action="store_true", help="Reload BIOS code on running target")
     target.add_argument("--flash",  action="store_true", help="Flash bitstream to QSPI flash configuration memory")
+    target.add_argument("--scan-pll", nargs=3, help="Scan for available PLL configs in sysclk frequency range (fmin, fmax, fstep)")
     target.add_argument("--sys-clk-freq", default="50e6", help="System clock frequency")
     target.add_argument("--iodelay-clk-freq", default="200e6", help="IODELAYCTRL frequency")
     target.add_argument("--rw-bios-mem", action="store_true", help="Make BIOS memory writable")
@@ -304,9 +307,34 @@ def main():
         # 100k to satisfy BIOS requiring MAIN_RAM_BASE
         soc_kwargs["integrated_main_ram_size"] = 0x10000
 
+    sys_clk_freq     = int(float(args.sys_clk_freq))
+    iodelay_clk_freq = int(float(args.iodelay_clk_freq))
+
+    if args.scan_pll:
+        fmin, fmax, fstep = map(float, args.scan_pll)
+        found = []
+        for i in range(math.floor((fmax - fmin) / fstep)):
+            freq = fmin + i * fstep
+            crg = _CRG(platform=lpddr4_test_board.Platform(),
+                sys_clk_freq=freq, iodelay_clk_freq=iodelay_clk_freq, with_sdram=args.with_sdram,
+                with_ethernet=args.with_ethernet or args.with_etherbone, with_sys8x_90=args.no_odelay)
+            try:
+                print(f"Trying sys_clk_freq = {freq/1e6:6.2f} MHz ... ")
+                crg.finalize()
+                found.append(freq)
+                print(f"  ... OK")
+            except ValueError as e:
+                if "No PLL config found" not in str(e):
+                    raise
+                print(f"  ... FAIL")
+        print("\nFound PLL configs for:")
+        for freq in found:
+            print(f"  sys_clk_freq = {freq/1e6:6.2f} MHz")
+        sys.exit(0)
+
     soc = BaseSoC(
-        sys_clk_freq      = int(float(args.sys_clk_freq)),
-        iodelay_clk_freq  = int(float(args.iodelay_clk_freq)),
+        sys_clk_freq      = sys_clk_freq,
+        iodelay_clk_freq  = iodelay_clk_freq,
         with_sdram        = args.with_sdram,
         with_masked_write = not args.no_masked_write,
         with_ethernet     = args.with_ethernet,
