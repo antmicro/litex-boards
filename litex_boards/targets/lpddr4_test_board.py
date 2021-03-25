@@ -26,7 +26,8 @@ from litehyperbus.core.hyperbus import HyperRAM
 # CRG ----------------------------------------------------------------------------------------------
 
 class _CRG(Module):
-    def __init__(self, platform, sys_clk_freq, with_sdram, with_ethernet, with_sys8x_90):
+    def __init__(self, platform, sys_clk_freq, iodelay_clk_freq, with_sdram, with_ethernet,
+            with_sys8x_90):
         self.clock_domains.cd_sys       = ClockDomain()
         if with_sdram:
             self.clock_domains.cd_sys2x     = ClockDomain(reset_less=True)
@@ -48,7 +49,7 @@ class _CRG(Module):
             if with_sys8x_90:
                 pll.create_clkout(self.cd_sys8x_90, 8*sys_clk_freq, phase=90)
         if with_sdram or with_ethernet:
-            pll.create_clkout(self.cd_idelay,    200e6)
+            pll.create_clkout(self.cd_idelay,    iodelay_clk_freq)
 
         if with_sdram or with_ethernet:
             self.submodules.idelayctrl = S7IDELAYCTRL(self.cd_idelay)
@@ -56,9 +57,9 @@ class _CRG(Module):
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq, with_sdram, with_ethernet, with_etherbone, with_hyperram,
-            with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard, with_odelay,
-            **kwargs):
+    def __init__(self, sys_clk_freq, iodelay_clk_freq, with_sdram, with_ethernet, with_etherbone,
+            with_hyperram, with_uartbone, with_analyzer, rw_bios_mem, with_masked_write, with_sdcard,
+            with_odelay, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -69,8 +70,13 @@ class BaseSoC(SoCCore):
             **kwargs)
 
         # CRG --------------------------------------------------------------------------------------
-        self.submodules.crg = _CRG(platform, sys_clk_freq=sys_clk_freq, with_sdram=with_sdram,
-            with_ethernet=with_ethernet or with_etherbone, with_sys8x_90=not with_odelay)
+        self.submodules.crg = _CRG(platform,
+            sys_clk_freq     = sys_clk_freq,
+            iodelay_clk_freq = iodelay_clk_freq,
+            with_sdram       = with_sdram,
+            with_ethernet    = with_ethernet or with_etherbone,
+            with_sys8x_90    = not with_odelay,
+        )
 
         # LDDR4 SDRAM ------------------------------------------------------------------------------
         if with_sdram:
@@ -84,7 +90,7 @@ class BaseSoC(SoCCore):
 
             phy_cls = K7LPDDR4PHY if with_odelay else A7LPDDR4PHY
             self.submodules.ddrphy = phy_cls(platform.request("lpddr4"),
-                iodelay_clk_freq = 200e6,
+                iodelay_clk_freq = iodelay_clk_freq,
                 sys_clk_freq     = sys_clk_freq,
                 masked_write     = self.controller_settings.masked_write.storage,
             )
@@ -275,6 +281,7 @@ def main():
     target.add_argument("--load-bios",  action="store_true", help="Reload BIOS code on running target")
     target.add_argument("--flash",  action="store_true", help="Flash bitstream to QSPI flash configuration memory")
     target.add_argument("--sys-clk-freq", default="50e6", help="System clock frequency")
+    target.add_argument("--iodelay-clk-freq", default="200e6", help="IODELAYCTRL frequency")
     target.add_argument("--rw-bios-mem", action="store_true", help="Make BIOS memory writable")
     target.add_argument("--with-sdram", action="store_true", help="Add LPDDR4 PHY")
     target.add_argument("--no-masked-write", action="store_true", help="Use LPDDR4 WRITE instead of MASKED-WRITE")
@@ -299,6 +306,7 @@ def main():
 
     soc = BaseSoC(
         sys_clk_freq      = int(float(args.sys_clk_freq)),
+        iodelay_clk_freq  = int(float(args.iodelay_clk_freq)),
         with_sdram        = args.with_sdram,
         with_masked_write = not args.no_masked_write,
         with_ethernet     = args.with_ethernet,
