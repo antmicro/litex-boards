@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 import os
+import math
 import argparse
 
 from migen import *
@@ -55,13 +56,14 @@ class BaseSoC(SoCCore):
     def __init__(self, *, sys_clk_freq=int(50e6), iodelay_clk_freq=200e6,
             with_ethernet=False, with_etherbone=False, eth_ip="192.168.1.50", eth_dynamic_ip=False,
             with_hyperram=False, with_sdcard=False, with_jtagbone=True, with_uartbone=False,
-            ident_version=True, **kwargs):
+            ident_version=True, rw_bios_mem=False, with_masked_write=True, l2_size=8192, **kwargs):
         platform = lpddr4_test_board.Platform()
 
         # SoCCore ----------------------------------------------------------------------------------
         SoCCore.__init__(self, platform, sys_clk_freq,
             ident         = "LiteX SoC on LPDDR4 Test Board",
             ident_version = ident_version,
+            integrated_rom_mode = 'rw' if rw_bios_mem else 'r',
             **kwargs)
 
         # CRG --------------------------------------------------------------------------------------
@@ -69,16 +71,55 @@ class BaseSoC(SoCCore):
 
         # LDDR4 SDRAM ------------------------------------------------------------------------------
         if not self.integrated_main_ram_size:
+            from litex.soc.interconnect.csr import AutoCSR, CSRStorage, CSRStatus
+            class ControllerDynamicSettings(Module, AutoCSR):
+                def __init__(self):
+                    self.refresh = CSRStorage(reset=1, description="Enable/disable Refresh commands sending")
+                    self.masked_write = CSRStorage(reset=int(with_masked_write), description="Switch between WRITE/MASKED-WRITE commands")
+            self.submodules.controller_settings = ControllerDynamicSettings()
+            self.add_csr("controller_settings")
+
             self.submodules.ddrphy = lpddr4.K7LPDDR4PHY(platform.request("lpddr4"),
                 iodelay_clk_freq = iodelay_clk_freq,
                 sys_clk_freq     = sys_clk_freq,
+                masked_write     = self.controller_settings.masked_write.storage,
             )
+
+            from litedram.core.controller import ControllerSettings
+            controller_settings = ControllerSettings()
+            controller_settings.with_auto_precharge = False
+            controller_settings.with_refresh = self.controller_settings.refresh.storage
+
+            module = MT53E256M16D1(sys_clk_freq, "1:8")
             self.add_sdram("sdram",
                 phy                     = self.ddrphy,
                 module                  = MT53E256M16D1(sys_clk_freq, "1:8"),
-                l2_cache_size           = kwargs.get("l2_size", 8192),
+                l2_cache_size           = l2_size,
                 l2_cache_min_data_width = 256,
+                controller_settings     = controller_settings,
             )
+
+            # Debug info ---------------------------------------------------------------------------
+            def dump(obj):
+                print()
+                print(" " + obj.__class__.__name__)
+                print(" " + "-" * len(obj.__class__.__name__))
+                d = obj if isinstance(obj, dict) else vars(obj)
+                for var, val in d.items():
+                    if var == "self":
+                        continue
+                    if isinstance(val, Signal):
+                        val = "Signal(reset={})".format(val.reset.value)
+                    print("  {}: {}".format(var, val))
+
+            print("=" * 80)
+            dump(self.ddrphy.settings)
+            dump(module.geom_settings)
+            dump(module.timing_settings)
+            print()
+            __import__('pprint').pprint(self.ddrphy.dfi.layout[0])
+            print()
+            print("=" * 80)
 
         # HyperRAM ---------------------------------------------------------------------------------
         if with_hyperram:
@@ -125,8 +166,12 @@ def main():
     target.add_argument("--build",            action="store_true",    help="Build bitstream")
     target.add_argument("--load",             action="store_true",    help="Load bitstream")
     target.add_argument("--flash",            action="store_true",    help="Flash bitstream")
+    target.add_argument("--load-bios",  action="store_true", help="Reload BIOS code on running target")
+    target.add_argument("--scan-pll", nargs=3, help="Scan for available PLL configs in sysclk frequency range (fmin, fmax, fstep)")
     target.add_argument("--sys-clk-freq",     default=50e6,           help="System clock frequency")
     target.add_argument("--iodelay-clk-freq", default=200e6,          help="IODELAYCTRL frequency")
+    target.add_argument("--rw-bios-mem", action="store_true", help="Make BIOS memory writable")
+    target.add_argument("--no-masked-write", action="store_true", help="Use LPDDR4 WRITE instead of MASKED-WRITE")
     ethopts = target.add_mutually_exclusive_group()
     ethopts.add_argument("--with-ethernet",   action="store_true",    help="Add Ethernet")
     ethopts.add_argument("--with-etherbone",  action="store_true",    help="Add EtherBone")
@@ -142,11 +187,56 @@ def main():
     vivado_build_args(parser)
     args = parser.parse_args()
 
+    sys_clk_freq      = int(float(args.sys_clk_freq))
+    iodelay_clk_freq  = int(float(args.iodelay_clk_freq))
+
+    if args.scan_pll:
+        verbose = False
+
+        if not verbose:
+            import logging
+            logging.getLogger("S7PLL").setLevel(logging.WARNING)
+
+        fmin, fmax, fstep = map(float, args.scan_pll)
+        found = []
+        for i in range(math.floor((fmax - fmin) / fstep)):
+            freq = fmin + i * fstep
+            crg = _CRG(platform=lpddr4_test_board.Platform(), sys_clk_freq=freq, iodelay_clk_freq=iodelay_clk_freq)
+            try:
+                if verbose: print(f"Trying sys_clk_freq = {freq/1e6:6.2f} MHz ... ")
+                crg.finalize()
+                found.append(freq)
+                if verbose:
+                    print(f"  ... OK")
+                else:
+                    print(".", end="", flush=True)
+            except ValueError as e:
+                if "No PLL config found" not in str(e):
+                    raise
+                if verbose:
+                    print(f"  ... FAIL")
+                else:
+                    print("X", end="", flush=True)
+        print("\nFound PLL configs for:")
+        prev = None
+        for freq in found:
+            if prev is None or (freq - prev) > fstep * 1.001:
+                print("---")
+            print(f"  sys_clk_freq = {freq/1e6:6.2f} MHz")
+            prev = freq
+        import sys
+        sys.exit(0)
+
     assert not (args.with_etherbone and args.eth_dynamic_ip)
 
+    soc_kwargs = soc_core_argdict(args)
+    soc_kwargs['integrated_rom_size'] = 0x10000
+
     soc = BaseSoC(
-        sys_clk_freq      = int(float(args.sys_clk_freq)),
-        iodelay_clk_freq  = int(float(args.iodelay_clk_freq)),
+        sys_clk_freq      = sys_clk_freq,
+        iodelay_clk_freq  = iodelay_clk_freq,
+        with_masked_write = not args.no_masked_write,
+        rw_bios_mem       = args.rw_bios_mem,
         with_ethernet     = args.with_ethernet,
         with_etherbone    = args.with_etherbone,
         eth_ip            = args.eth_ip,
@@ -156,7 +246,8 @@ def main():
         with_jtagbone     = args.with_jtagbone,
         with_uartbone     = args.with_uartbone,
         ident_version     = args.no_ident_version,
-        **soc_core_argdict(args))
+        l2_size           = args.l2_size,
+        **soc_kwargs)
     builder = Builder(soc, **builder_argdict(args))
     vns = builder.build(**vivado_build_argdict(args), run=args.build)
 
@@ -167,6 +258,39 @@ def main():
     if args.flash:
         prog = soc.platform.create_programmer()
         prog.flash(0, os.path.join(builder.gateware_dir, soc.build_name + ".bin"))
+
+    if args.load_bios:
+        # FIXME: writing the memory during runtime may lead to unexpected behaviour,
+        # but currently it is not possible to hold the CPU in a reset state using ctrl_reset
+        assert args.rw_bios_mem, 'BIOS memory must be writible'
+
+        from litex import RemoteClient
+        wb = RemoteClient()
+        wb.open()
+
+        def memwrite(wb, data, *, base, burst=0xff):
+            for i in range(0, len(data), burst):
+                wb.write(base + 4 * i, data[i:i + burst])
+
+        from litex.soc.integration.common import get_mem_data
+        bios_bin = os.path.join(builder.software_dir, "bios", "bios.bin")
+        rom_data = get_mem_data(bios_bin, "little")
+
+        # reboot CPU
+        print('Rebooting CPU')
+        wb.regs.ctrl_reset.write(1)
+        import time
+        time.sleep(0.2)
+
+        print(f"Loading BIOS from: {bios_bin} starting at 0x{wb.mems.rom.base:08x} ...")
+        memwrite(wb, rom_data, base=wb.mems.rom.base)
+        wb.read(wb.mems.rom.base)
+
+        # reboot CPU
+        print('Rebooting CPU')
+        wb.regs.ctrl_reset.write(1)
+
+        wb.close()
 
 if __name__ == "__main__":
     main()
