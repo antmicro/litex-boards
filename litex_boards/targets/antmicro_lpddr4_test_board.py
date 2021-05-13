@@ -99,6 +99,8 @@ class BaseSoC(SoCCore):
                 controller_settings     = controller_settings,
             )
 
+            self.add_constant("SDRAM_DEBUG")
+
             # Debug info ---------------------------------------------------------------------------
             def dump(obj):
                 print()
@@ -139,6 +141,7 @@ class BaseSoC(SoCCore):
                 clock_pads = self.platform.request("eth_clocks"),
                 pads       = self.platform.request("eth"),
                 rx_delay   = 0.8e-9,
+                iodelay_clk_freq = iodelay_clk_freq,
             )
             if with_ethernet:
                 self.add_ethernet(phy=self.ethphy, dynamic_ip=eth_dynamic_ip)
@@ -277,10 +280,10 @@ def main():
         rom_data = get_mem_data(bios_bin, "little")
 
         # reboot CPU
-        print('Rebooting CPU')
-        wb.regs.ctrl_reset.write(1)
-        import time
-        time.sleep(0.2)
+        print('Reseting CPU')
+        wb.regs.ctrl_reset_hold.write(1)
+        # import time
+        # time.sleep(0.2)
 
         print(f"Loading BIOS from: {bios_bin} starting at 0x{wb.mems.rom.base:08x} ...")
         memwrite(wb, rom_data, base=wb.mems.rom.base)
@@ -288,7 +291,7 @@ def main():
 
         # reboot CPU
         print('Rebooting CPU')
-        wb.regs.ctrl_reset.write(1)
+        wb.regs.ctrl_reset_hold.write(0)
 
         wb.close()
 
