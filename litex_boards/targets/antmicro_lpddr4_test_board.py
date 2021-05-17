@@ -281,9 +281,7 @@ def main():
 
         # reboot CPU
         print('Reseting CPU')
-        wb.regs.ctrl_reset_hold.write(1)
-        # import time
-        # time.sleep(0.2)
+        wb.regs.ctrl_reset.write(0b10)  # cpu_rst
 
         print(f"Loading BIOS from: {bios_bin} starting at 0x{wb.mems.rom.base:08x} ...")
         memwrite(wb, rom_data, base=wb.mems.rom.base)
@@ -291,7 +289,7 @@ def main():
 
         # reboot CPU
         print('Rebooting CPU')
-        wb.regs.ctrl_reset_hold.write(0)
+        wb.regs.ctrl_reset.write(0)
 
         wb.close()
 
