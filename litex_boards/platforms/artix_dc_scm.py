@@ -9,9 +9,9 @@ _io = [
     ("clk100", 0, Pins("C18"), IOStandard("LVCMOS33")),
 
     # Leds
-    ("user_led", 0, Pins("B22"),  IOStandard("LVCMOS33")),
-    ("user_led", 1, Pins("C22"),  IOStandard("LVCMOS33")),
-    ("user_led", 2, Pins("D22"),  IOStandard("LVCMOS33")),
+    ("user_led", 0, Pins("T20"),  IOStandard("LVCMOS33")),
+    ("user_led", 1, Pins("U20"),  IOStandard("LVCMOS33")),
+    ("user_led", 2, Pins("W20"),  IOStandard("LVCMOS33")),
 
     # Serial
     ("serial", 0,
@@ -42,11 +42,11 @@ _io = [
             IOStandard("SSTL135"),
             Misc("IN_TERM=UNTUNED_SPLIT_40")),
         Subsignal("dqs_p", Pins("K2 E1"),
-                  IOStandard("DIFF_SSTL135"),
-                  Misc("IN_TERM=UNTUNED_SPLIT_40")),
+            IOStandard("DIFF_SSTL135"),
+            Misc("IN_TERM=UNTUNED_SPLIT_40")),
         Subsignal("dqs_n", Pins("J2 D1"),
-                  IOStandard("DIFF_SSTL135"),
-                  Misc("IN_TERM=UNTUNED_SPLIT_40")),
+            IOStandard("DIFF_SSTL135"),
+            Misc("IN_TERM=UNTUNED_SPLIT_40")),
         Subsignal("clk_p", Pins("P5"), IOStandard("DIFF_SSTL135")),
         Subsignal("clk_n", Pins("P4"), IOStandard("DIFF_SSTL135")),
         Subsignal("cke", Pins("J6"), IOStandard("SSTL135")),
@@ -56,21 +56,20 @@ _io = [
     ),
 
     # RGMII Ethernet
-    ("eth_ref_clk", 0, Pins("N19"), IOStandard("LVCMOS33")),  # 125 MHz if enabled?
+    ("eth_ref_clk", 0, Pins("H19"), IOStandard("LVCMOS33")),  # 125 MHz if enabled?
     ("eth_clocks", 0,
-        Subsignal("tx", Pins("J22")),
-        # Subsignal("rx", Pins("M21")),
-        Subsignal("rx", Pins("L19")),
+        Subsignal("tx", Pins("J19")),
+        Subsignal("rx", Pins("K19")),
         IOStandard("LVCMOS33")
     ),
     ("eth", 0,
         Subsignal("rst_n",   Pins("N18"), IOStandard("LVCMOS33")),
         Subsignal("int_n",   Pins("N20"), IOStandard("LVCMOS33")),
-        Subsignal("mdio",    Pins("M20"), IOStandard("LVCMOS33")),
+        Subsignal("mdio",    Pins("M21"), IOStandard("LVCMOS33")),
         Subsignal("mdc",     Pins("N22"), IOStandard("LVCMOS33")),
         Subsignal("rx_ctl",  Pins("M22"), IOStandard("LVCMOS33")),
         Subsignal("rx_data", Pins("L20 L21 K21 K22"), IOStandard("LVCMOS33")),
-        Subsignal("tx_ctl",  Pins("J20"), IOStandard("LVCMOS33")),
+        Subsignal("tx_ctl",  Pins("J22"), IOStandard("LVCMOS33")),
         Subsignal("tx_data", Pins("G20 H20 H22 J21"), IOStandard("LVCMOS33")),
     ),
 
@@ -86,23 +85,23 @@ _io = [
     ),
 
     # USB ULPI
-    ("ulpi_clock", 0, Pins("W19"), IOStandard("LVCMOS33")), #
-    ("ulpi", 0, #
-        Subsignal("data", Pins("AB18 AA18 AA19 AB20 AA20 AB21 AA21 AB22")), #
-        Subsignal("dir", Pins("W21")), #
-        Subsignal("stp", Pins("Y22")), #
-        Subsignal("nxt", Pins("W22")), #
-        Subsignal("rst", Pins("V20")), #
+    ("ulpi_clock", 0, Pins("W19"), IOStandard("LVCMOS33")),
+    ("ulpi", 0,
+        Subsignal("data", Pins("AB18 AA18 AA19 AB20 AA20 AB21 AA21 AB22")),
+        Subsignal("dir", Pins("W21")),
+        Subsignal("stp", Pins("Y22")),
+        Subsignal("nxt", Pins("W22")),
+        Subsignal("rst", Pins("V20")),
         IOStandard("LVCMOS33"), Misc("SLEW=FAST")
     ),
 
-    ("ulpi_clock", 1, Pins("V4"), IOStandard("LVCMOS33")), #
-    ("ulpi", 1, #
-        Subsignal("data", Pins("AB2 AA3 AB3 Y4 AA4 AB5 AA5 AB6")),  #
-        Subsignal("dir", Pins("AB7")), #
-        Subsignal("stp", Pins("AA6")), #
-        Subsignal("nxt", Pins("AB8")), #
-        Subsignal("rst", Pins("AA8")), #
+    ("ulpi_clock", 1, Pins("V4"), IOStandard("LVCMOS33")),
+    ("ulpi", 1,
+        Subsignal("data", Pins("AB2 AA3 AB3 Y4 AA4 AB5 AA5 AB6")),
+        Subsignal("dir", Pins("AB7")),
+        Subsignal("stp", Pins("AA6")),
+        Subsignal("nxt", Pins("AB8")),
+        Subsignal("rst", Pins("AA8")),
         IOStandard("LVCMOS33"), Misc("SLEW=FAST")
     ),
 
