@@ -61,7 +61,7 @@ class _CRG(Module):
         self.comb += platform.request("eth_ref_clk").eq(self.cd_eth.clk)
 
 class Counter(Module, AutoCSR):
-    def __init__(self, pads):
+    def __init__(self, pads, spiflash):
         self.control = CSRStorage(description="Counter controll register",
             fields=[
                 CSRField("enable", size=1, description="eneable counter"),
@@ -76,14 +76,26 @@ class Counter(Module, AutoCSR):
         cnt_clk = Signal(32)
         cnt_cs = Signal(32)
 
+        # fake clk to syn with sck
+        fake_clk = Signal()
+        div = Signal(len(spiflash.phy._spi_clk_divisor))
+        div_cnt = Signal(len(spiflash.phy._spi_clk_divisor), reset=0)
+        self.comb += div.eq(spiflash.phy._spi_clk_divisor)
+        self.sync += [
+            If(self.control.fields.reset,
+                cnt_cs.eq(0)
+            ).Elif(~pads.cs_n,
+                If(div_cnt < div,
+                    div_cnt.eq(div_cnt+1),
+                ).Else(
+                    div_cnt.eq(0),
+                    cnt_cs.eq(cnt_cs+1)
+                )
+            )
+        ]
+
         self.comb += [self.counter.fields.clk_ticks.eq(cnt_clk),
                       self.counter.fields.cs_ticks.eq(cnt_cs)]
-
-        self.sync += [If(self.control.fields.reset,
-                cnt_cs.eq(0)
-            ).Elif(~pads.cs_n&self.control.fields.enable,
-                cnt_cs.eq(cnt_cs+1)
-            )]
 
 # BaseSoC ------------------------------------------------------------------------------------------
 
@@ -128,12 +140,12 @@ class BaseSoC(SoCCore):
 
         # Flash (through LiteSPI, experimental).
         if with_mapped_flash:
-            spiplatform = platform.request("spiflash")
-            self.submodules.spiflash_phy  = LiteSPIPHY(spiplatform, S25FL128L(Codes.READ_1_1_1))
+            spiplatform = platform.request("spiflash4x")
+            self.submodules.spiflash_phy  = spiflash_phy = LiteSPIPHY(spiplatform, S25FL128L(Codes.READ_1_1_4))
             self.submodules.spiflash_mmap = LiteSPI(self.spiflash_phy, clk_freq=sys_clk_freq, mmap_endianness=self.cpu.endianness)
             spiflash_region = SoCRegion(origin=self.mem_map.get("spiflash", None), size=S25FL128L.total_size, cached=False)
             self.bus.add_slave(name="spiflash", slave=self.spiflash_mmap.bus, region=spiflash_region)
-            counter = Counter(spiplatform)
+            counter = Counter(spiplatform, spiflash_phy)
             self.submodules.counter = counter
             self.add_csr("counter")
 
