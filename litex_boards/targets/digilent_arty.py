@@ -68,7 +68,7 @@ class Counter(Module, AutoCSR):
                 CSRField("reset",  size=1, description="reset counter", pulse=1)
             ])
 
-        self.counter = CSRStatus(description="Counter controll register",
+        self.counter = CSRStatus(description="Counter register",
             fields=[
                 CSRField("clk_ticks", size=32, description="clk data"),
                 CSRField("cs_ticks", size=32, description="cs data"),
@@ -81,15 +81,18 @@ class Counter(Module, AutoCSR):
         div = Signal(len(spiflash.phy._spi_clk_divisor))
         div_cnt = Signal(len(spiflash.phy._spi_clk_divisor), reset=0)
         self.comb += div.eq(spiflash.phy._spi_clk_divisor)
+
         self.sync += [
             If(self.control.fields.reset,
-                cnt_cs.eq(0)
-            ).Elif(~pads.cs_n,
+                cnt_cs.eq(0),
+                cnt_clk.eq(0)
+            ).Elif(~pads.cs_n&self.control.fields.enable,
+                cnt_cs.eq(cnt_cs+1),
                 If(div_cnt < div,
                     div_cnt.eq(div_cnt+1),
                 ).Else(
                     div_cnt.eq(0),
-                    cnt_cs.eq(cnt_cs+1)
+                    cnt_clk.eq(cnt_clk+1)
                 )
             )
         ]
