@@ -50,7 +50,7 @@ class _CRG(Module):
         self.comb += pll.reset.eq(~platform.request("cpu_reset") | self.rst)
         pll.register_clkin(platform.request("clk100"), 100e6)
         pll.create_clkout(self.cd_sys,       sys_clk_freq)
-        pll.create_clkout(self.cd_sys2x,     2*sys_clk_freq)
+        pll.create_clkout(self.cd_sys2x,     2*sys_clk_freq, with_reset=False)
         pll.create_clkout(self.cd_sys8x,     8*sys_clk_freq)
         pll.create_clkout(self.cd_sys8x_dqs, 8*sys_clk_freq, phase=90)
         pll.create_clkout(self.cd_idelay,    200e6)
@@ -58,6 +58,10 @@ class _CRG(Module):
         platform.add_false_path_constraints(self.cd_sys.clk, pll.clkin) # Ignore sys_clk to pll.clkin path created by SoC's rst.
 
         self.submodules.idelayctrl = S7IDELAYCTRL(self.cd_idelay)
+
+        # Make sure sys2x counters are reset syncronized to sys clock
+        # HalfRateA7DDRPHY will pass `serdes_reset_cnt=0` to DFIRateConverter
+        self.comb += self.cd_sys2x.rst.eq(self.cd_sys.rst)
 
         self.comb += platform.request("eth_ref_clk").eq(self.cd_eth.clk)
 
