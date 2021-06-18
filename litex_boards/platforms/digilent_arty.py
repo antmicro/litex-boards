@@ -95,6 +95,14 @@ _io = [
         Subsignal("hold", Pins("M14")),
         IOStandard("LVCMOS33"),
     ),
+
+    ("spiflash2x", 0,
+        Subsignal("cs_n", Pins("L13")),
+        Subsignal("clk",  Pins("L16")),
+        Subsignal("dq",   Pins("K17", "K18")),
+        IOStandard("LVCMOS33")
+    ),
+
     ("spiflash4x", 0,
         Subsignal("cs_n", Pins("L13")),
         Subsignal("clk",  Pins("L16")),

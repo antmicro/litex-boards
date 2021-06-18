@@ -18,6 +18,7 @@ from litex_boards.platforms import crosslink_nx_evn
 from litex.soc.cores.ram import NXLRAM
 from litex.soc.cores.clock import NXPLL
 from litex.soc.cores.spi_flash import SpiFlash
+from litex.soc.integration.soc import SoCRegion
 from litex.build.io import CRG
 from litex.build.generic_platform import *
 
@@ -27,6 +28,11 @@ from litex.soc.integration.builder import *
 from litex.soc.cores.led import LedChaser
 
 from litex.build.lattice.oxide import oxide_args, oxide_argdict
+
+from litespi.modules import MX25L12833F
+from litespi.opcodes import SpiNorFlashOpCodes as Codes
+from litespi.phy.generic import LiteSPIPHY
+from litespi import LiteSPI
 
 kB = 1024
 mB = 1024*kB
@@ -68,9 +74,10 @@ class BaseSoC(SoCCore):
         "sram" : 0x40000000,
         "csr"  : 0xf0000000,
     }
-    def __init__(self, sys_clk_freq=int(75e6), toolchain="radiant", **kwargs):
+    def __init__(self, sys_clk_freq=int(75e6), toolchain="radiant", with_mapped_flash=False, **kwargs):
         platform = crosslink_nx_evn.Platform(toolchain=toolchain)
-        platform.add_platform_command("ldc_set_sysconfig {{MASTER_SPI_PORT=SERIAL}}")
+        if not  with_mapped_flash:
+            platform.add_platform_command("ldc_set_sysconfig {{MASTER_SPI_PORT=SERIAL}}")
 
         # Disable Integrated SRAM since we want to instantiate LRAM specifically for it
         kwargs["integrated_sram_size"] = 0
@@ -83,6 +90,14 @@ class BaseSoC(SoCCore):
             ident         = "LiteX SoC on Crosslink-NX Evaluation Board",
             ident_version = True,
             **kwargs)
+
+        # Flash (through LiteSPI, experimental).
+        if with_mapped_flash:
+            self.submodules.spiflash_phy  = LiteSPIPHY(platform.request("spiflash4x"), MX25L12833F(Codes.READ_1_1_4))
+            self.submodules.spiflash_mmap = LiteSPI(self.spiflash_phy, clk_freq=sys_clk_freq, mmap_endianness=self.cpu.endianness)
+            spiflash_region = SoCRegion(origin=self.mem_map.get("spiflash", None), size=MX25L12833F.total_size, cached=False)
+            self.bus.add_slave(name="spiflash", slave=self.spiflash_mmap.bus, region=spiflash_region)
+
 
         # CRG --------------------------------------------------------------------------------------
         self.submodules.crg = _CRG(platform, sys_clk_freq)
@@ -107,6 +122,7 @@ def main():
     parser.add_argument("--sys-clk-freq",  default=75e6,        help="System clock frequency (default: 75MHz)")
     parser.add_argument("--serial",        default="serial",    help="UART Pins: serial (default, requires R15 and R17 to be soldered) or serial_pmod[0-2]")
     parser.add_argument("--prog-target",   default="direct",    help="Programming Target: direct or flash")
+    parser.add_argument("--with-mapped-flash",   action="store_true",              help="Enable Memory Mapped Flash")
     builder_args(parser)
     soc_core_args(parser)
     oxide_args(parser)
@@ -115,6 +131,7 @@ def main():
     soc = BaseSoC(
         sys_clk_freq = int(float(args.sys_clk_freq)),
         toolchain    = args.toolchain,
+        with_mapped_flash = args.with_mapped_flash,
         **soc_core_argdict(args)
     )
     builder = Builder(soc, **builder_argdict(args))
