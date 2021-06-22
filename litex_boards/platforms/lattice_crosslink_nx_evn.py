@@ -28,8 +28,10 @@ _io = [
     # Requires installation of 0-ohm jumpers R15 and R17 to properly route signals
     # Note that it is R15 and R17, not R16 and R17 as stated in the user guide
     ("serial", 0,
-        Subsignal("rx", Pins("F16"), IOStandard("LVCMOS33")),
-        Subsignal("tx", Pins("F18"), IOStandard("LVCMOS33")),
+       # Subsignal("rx", Pins("F16"), IOStandard("LVCMOS33")),
+       # Subsignal("tx", Pins("F18"), IOStandard("LVCMOS33")),
+       Subsignal("rx", Pins("D10"), IOStandard("LVCMOS33")),
+       Subsignal("tx", Pins("D9"), IOStandard("LVCMOS33")),
     ),
 
     # Section 7.3 General Purpose LEDs

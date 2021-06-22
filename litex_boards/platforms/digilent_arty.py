@@ -67,6 +67,12 @@ _io = [
         IOStandard("LVCMOS33")
     ),
 
+    ("pmod", 0,
+        Subsignal("tx", Pins("G13")),
+        Subsignal("rx", Pins("B11")),
+        IOStandard("LVCMOS33")
+    ),
+
     # SPI
     ("spi", 0,
         Subsignal("clk",  Pins("F1")),
