@@ -60,15 +60,16 @@ class _CRG(Module):
 
         self.comb += platform.request("eth_ref_clk").eq(self.cd_eth.clk)
 
+
 class Counter(Module, AutoCSR):
-    def __init__(self, pads):
+    def __init__(self, pads, spiflash):
         self.control = CSRStorage(description="Counter controll register",
             fields=[
                 CSRField("enable", size=1, description="eneable counter"),
                 CSRField("reset",  size=1, description="reset counter", pulse=1)
             ])
 
-        self.counter = CSRStatus(description="Counter controll register",
+        self.counter = CSRStatus(description="Counter register",
             fields=[
                 CSRField("clk_ticks", size=32, description="clk data"),
                 CSRField("cs_ticks", size=32, description="cs data"),
@@ -76,19 +77,35 @@ class Counter(Module, AutoCSR):
         cnt_clk = Signal(32)
         cnt_cs = Signal(32)
 
+        # fake clk to syn with sck
+        fake_clk = Signal()
+        div = Signal(len(spiflash.phy._spi_clk_divisor))
+        div_cnt = Signal(len(spiflash.phy._spi_clk_divisor), reset=0)
+        self.comb += div.eq(spiflash.phy._spi_clk_divisor)
+
+        self.sync += [
+            If(self.control.fields.reset,
+                cnt_cs.eq(0),
+                cnt_clk.eq(0)
+            ).Elif(~pads.cs_n&self.control.fields.enable,
+                cnt_cs.eq(cnt_cs+1),
+                If(div_cnt < div,
+                    div_cnt.eq(div_cnt+1),
+                ).Else(
+                    div_cnt.eq(0),
+                    cnt_clk.eq(cnt_clk+1)
+                )
+            )
+        ]
+
         self.comb += [self.counter.fields.clk_ticks.eq(cnt_clk),
                       self.counter.fields.cs_ticks.eq(cnt_cs)]
 
-        self.sync += [If(self.control.fields.reset,
-                cnt_cs.eq(0)
-            ).Elif(~pads.cs_n&self.control.fields.enable,
-                cnt_cs.eq(cnt_cs+1)
-            )]
 
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, variant="a7-35", toolchain="vivado", sys_clk_freq=int(100e6), with_ethernet=False, with_etherbone=False, eth_ip="192.168.1.50", eth_dynamic_ip=False, ident_version=True, with_jtagbone=True, with_mapped_flash=False, **kwargs):
+    def __init__(self, variant="a7-35", toolchain="vivado", sys_clk_freq=int(100e6), with_ethernet=False, with_etherbone=False, eth_ip="192.168.1.50", eth_dynamic_ip=False, ident_version=True, with_jtagbone=True, with_mapped_flash=True, **kwargs):
         platform = arty.Platform(variant=variant, toolchain=toolchain)
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -127,15 +144,16 @@ class BaseSoC(SoCCore):
             self.add_jtagbone()
 
         # Flash (through LiteSPI, experimental).
-        if with_mapped_flash:
+        if not with_mapped_flash:
             spiplatform = platform.request("spiflash")
             self.submodules.spiflash_phy  = LiteSPIPHY(spiplatform, S25FL128L(Codes.READ_1_1_1))
             self.submodules.spiflash_mmap = LiteSPI(self.spiflash_phy, clk_freq=sys_clk_freq, mmap_endianness=self.cpu.endianness)
             spiflash_region = SoCRegion(origin=self.mem_map.get("spiflash", None), size=S25FL128L.total_size, cached=False)
             self.bus.add_slave(name="spiflash", slave=self.spiflash_mmap.bus, region=spiflash_region)
-            counter = Counter(spiplatform)
+            counter = Counter(spiplatform, self.spiflash_phy)
             self.submodules.counter = counter
             self.add_csr("counter")
+        else:
 
 
         # Leds -------------------------------------------------------------------------------------
@@ -163,7 +181,7 @@ def main():
     parser.add_argument("--sdcard-adapter",      type=str,                         help="SDCard PMOD adapter: digilent (default) or numato")
     parser.add_argument("--no-ident-version",    action="store_false",             help="Disable build time output")
     parser.add_argument("--with-jtagbone",       action="store_true",              help="Enable Jtagbone support")
-    parser.add_argument("--with-mapped-flash",   action="store_true",              help="Enable Memory Mapped Flash")
+    parser.add_argument("--with-mapped-flash",   action="store_true", default=True,              help="Enable Memory Mapped Flash")
     builder_args(parser)
     soc_core_args(parser)
     vivado_build_args(parser)
@@ -181,7 +199,8 @@ def main():
         eth_dynamic_ip    = args.eth_dynamic_ip,
         ident_version     = args.no_ident_version,
         with_jtagbone     = args.with_jtagbone,
-        with_mapped_flash = args.with_mapped_flash,
+        #with_mapped_flash = args.with_mapped_flash,
+        with_mapped_flash = True,
         **soc_core_argdict(args)
     )
     if args.sdcard_adapter == "numato":
