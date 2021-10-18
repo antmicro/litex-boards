@@ -15,8 +15,8 @@ _io = [
 
     # Serial
     ("serial", 0,
-        Subsignal("tx", Pins("E17")),
-        Subsignal("rx", Pins("D17")),
+        Subsignal("tx", Pins("R19")),
+        Subsignal("rx", Pins("P19")),
         IOStandard("LVCMOS33"),
     ),
     ("serial", 1,
@@ -55,6 +55,15 @@ _io = [
         Misc("SLEW=FAST"),
     ),
 
+    # eMMC - there are pullups on the board so we don't enable them here
+    ("sdcard", 0,
+        Subsignal("data", Pins("P17 W17 R18 V18")),
+        Subsignal("cmd",  Pins("Y19")),
+        Subsignal("clk",  Pins("Y18")),
+            #Subsignal("cd",   Pins(),
+        Misc("SLEW=FAST"),
+        IOStandard("LVCMOS33"),
+    ),
     # RGMII Ethernet
     ("eth_ref_clk", 0, Pins("H19"), IOStandard("LVCMOS33")),  # 125 MHz if enabled?
     ("eth_clocks", 0,

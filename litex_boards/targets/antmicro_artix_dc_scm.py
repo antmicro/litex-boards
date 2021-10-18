@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import math
 import argparse
 
 from migen import *
@@ -14,7 +15,7 @@ from litex.soc.integration.soc_sdram import *
 from litex.soc.integration.builder import *
 from litex.soc.cores.led import LedChaser
 
-from litedram.modules import AS4C256M16D3A
+from litedram.modules import MT41K128M16
 from litedram.phy import s7ddrphy
 
 from liteeth.phy import LiteEthS7PHYRGMII
@@ -55,8 +56,8 @@ class _CRG(Module):
 # BaseSoC ------------------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, *, device, with_pcie, with_ethernet, with_sdram, toolchain="vivado",
-            sys_clk_freq=int(100e6), **kwargs):
+    def __init__(self, *, device, with_pcie, with_etherbone, with_ethernet, with_sdram, eth_dynamic_ip,
+            eth_reset_time, toolchain="vivado", sys_clk_freq=int(100e6), eth_ip="192.168.1.120", **kwargs):
         platform = artix_dc_scm.Platform(device=device, toolchain=toolchain)
 
         # SoCCore ----------------------------------------------------------------------------------
@@ -75,25 +76,23 @@ class BaseSoC(SoCCore):
                 memtype        = "DDR3",
                 nphases        = 4,
                 sys_clk_freq   = sys_clk_freq)
-            self.add_csr("ddrphy")
             self.add_sdram("sdram",
                 phy                     = self.ddrphy,
-                module                  = AS4C256M16D3A(sys_clk_freq, "1:4"),
+                module                  = MT41K128M16(sys_clk_freq, "1:4"),
                 origin                  = self.mem_map["main_ram"],
-                size                    = kwargs.get("max_sdram_size", 0x40000000),
-                l2_cache_size           = kwargs.get("l2_size", 8192),
-                l2_cache_min_data_width = kwargs.get("min_l2_data_width", 128),
-                l2_cache_reverse        = True
+                l2_cache_size           = kwargs.get("l2_size", 8192)
             )
 
         # Ethernet / Etherbone ---------------------------------------------------------------------
-        if with_ethernet:
+        if with_ethernet or with_etherbone:
             self.submodules.ethphy = LiteEthS7PHYRGMII(
                 clock_pads = self.platform.request("eth_clocks"),
-                pads       = self.platform.request("eth"))
-            self.add_csr("ethphy")
-            self.add_ethernet(phy=self.ethphy)
-            # self.add_etherbone(phy=self.ethphy)
+                pads       = self.platform.request("eth"),
+                hw_reset_cycles = math.ceil(float(eth_reset_time) * self.sys_clk_freq))
+            self.add_ethernet(phy=self.ethphy, dynamic_ip=eth_dynamic_ip)
+            platform.add_platform_command("set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets main_ethphy_eth_rx_clk_ibuf]")
+            if with_etherbone:
+                self.add_etherbone(phy=self.ethphy, ip_address=eth_ip)
 
         # PCIe -------------------------------------------------------------------------------------
         if with_pcie:
@@ -121,9 +120,14 @@ def main():
     group.add_argument("--device",           choices=["xc7a100tfgg484-1", "xc7a15tfgg484-1"], required=True)
     group.add_argument("--with-pcie",        action="store_true",  help="Add PCIe")
     group.add_argument("--with-ethernet",    action="store_true",  help="Add Ethernet")
-    group.add_argument("--with-sdram",    action="store_true",  help="Add SDRAM")
+    group.add_argument("--with-etherbone",   action="store_true",  help="Add Etherbone")
+    group.add_argument("--eth-ip",           default="192.168.1.120", type=str, help="Ethernet/Etherbone IP address")
+    group.add_argument("--eth-dynamic-ip",   action="store_true",  help="Enable dynamic Ethernet IP addresses setting")
+    group.add_argument("--with-sdram",       action="store_true",  help="Add SDRAM")
+    group.add_argument("--with-emmc",        action="store_true",  help="Add eMMC")
+    group.add_argument("--eth-reset-time",   default="10e-3",      help="Duration of Ethernet PHY reset")
     builder_args(parser)
-    soc_sdram_args(parser)
+    soc_core_args(parser)
     vivado_build_args(parser)
     args = parser.parse_args()
 
@@ -133,9 +137,17 @@ def main():
         sys_clk_freq   = int(float(args.sys_clk_freq)),
         with_pcie      = args.with_pcie,
         with_ethernet  = args.with_ethernet,
+        with_etherbone = args.with_etherbone,
+        eth_ip         = args.eth_ip,
+        eth_dynamic_ip = args.eth_dynamic_ip,
         with_sdram     = args.with_sdram,
-        **soc_sdram_argdict(args)
+        eth_reset_time = args.eth_reset_time,
+        **soc_core_argdict(args)
     )
+
+    if args.with_emmc:
+        soc.add_sdcard(software_debug=False)
+
     builder = Builder(soc, **builder_argdict(args))
     builder_kwargs = vivado_build_argdict(args) if args.toolchain == "vivado" else {}
     builder.build(**builder_kwargs, run=args.build)
