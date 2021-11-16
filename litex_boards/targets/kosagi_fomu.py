@@ -125,11 +125,12 @@ class BaseSoC(SoCCore):
                            with_master=with_spi_master)
 
         # Add ROM linker region --------------------------------------------------------------------
-        self.bus.add_region("rom", SoCRegion(
-            origin = self.mem_map["spiflash"] + bios_flash_offset,
-            size   = 32*kB,
-            linker = True)
-        )
+        if not self.integrated_rom_size:
+            self.bus.add_region("rom", SoCRegion(
+                origin = self.mem_map["spiflash"] + bios_flash_offset,
+                size   = 32*kB,
+                linker = True)
+            )
 
         # Leds -------------------------------------------------------------------------------------
         if with_led_chaser:
