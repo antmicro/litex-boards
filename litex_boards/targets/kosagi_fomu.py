@@ -70,7 +70,7 @@ class _CRG(Module):
 class BaseSoC(SoCCore):
     mem_map = {**SoCCore.mem_map, **{"spiflash": 0x80000000}}
     def __init__(self, bios_flash_offset, spi_flash_module="AT25SF161", sys_clk_freq=int(12e6),
-                 with_led_chaser=True, **kwargs):
+                 with_led_chaser=True, with_spi_master=False, **kwargs):
         kwargs["uart_name"] = "usb_acm" # Enforce UART to USB-ACM
         platform = fomu_pvt.Platform()
 
@@ -121,7 +121,8 @@ class BaseSoC(SoCCore):
             "MX25R1635F": lambda: MX25R1635F(Codes.READ_1_1_4),
             "W25Q128JV":  lambda: W25Q128JV( Codes.READ_1_1_4),
         }
-        self.add_spi_flash(mode="4x", module=spi_flash_modules[spi_flash_module](), with_master=False)
+        self.add_spi_flash(mode="4x", module=spi_flash_modules[spi_flash_module](),
+                           with_master=with_spi_master)
 
         # Add ROM linker region --------------------------------------------------------------------
         self.bus.add_region("rom", SoCRegion(
