@@ -15,6 +15,7 @@ from litex.soc.integration.builder import *
 
 class TestTargets(unittest.TestCase):
     excluded_platforms = [
+        "antmicro_ddr5_test_board",          # Reason: dependencies to unmerged ddr5 staff.
         "qmtech_daughterboard",              # Reason: Not a real platform.
         "quicklogic_quickfeather",           # Reason: No default clock.
         "efinix_titanium_ti60_f225_dev_kit", # Reason: Require Efinity toolchain.
@@ -29,6 +30,7 @@ class TestTargets(unittest.TestCase):
         "newae_cw305",                       # Reason: No default clock.
     ]
     excluded_targets   = [
+        "antmicro_ddr5_test_board",          # Reason: dependencies to unmerged ddr5 staff.
         "simple",                            # Reason: Generic target.
         "quicklogic_quickfeather",           # Reason: No default clock.
         "efinix_titanium_ti60_f225_dev_kit", # Reason: Require Efinity toolchain.
