@@ -36,16 +36,21 @@ _io = [
         IOStandard("LVCMOS33")
     ),
 
+    # Take A channel only
     ("ddr5", 0,
-        Subsignal("clk_p", Pins("U2"), IOStandard("DIFF_SSTL12")),
-        Subsignal("clk_n", Pins("V2"), IOStandard("DIFF_SSTL12")),
-        Subsignal("reset_n", Pins("L1"), IOStandard("SSTL12")),
-        Subsignal("alert_n", Pins("AB3"), IOStandard("SSTL12")),
-        Subsignal("cs_n", Pins("AA4"), IOStandard("SSTL12")),
-        Subsignal("ca", Pins("T3 M3 W1 P1 U1 N2 W2 P2 Y1 R1 AA1 T1 AB1 R2"), IOStandard("SSTL12")),
-        Subsignal("dq", Pins("M5 N5 N4 N3 P4 T4 U5 R4"), IOStandard("SSTL12_T_DCI")),
-        Subsignal("dqs_p", Pins("M2"), IOStandard("DIFF_SSTL12")),
-        Subsignal("dqs_n", Pins("M1"), IOStandard("DIFF_SSTL12")),
+        Subsignal("clk_p", Pins("AC9"), IOStandard("DIFF_SSTL12")),
+        Subsignal("clk_n", Pins("AD9"), IOStandard("DIFF_SSTL12")),
+        Subsignal("reset_n", Pins("AF3"), IOStandard("SSTL12")),
+        Subsignal("alert_n", Pins("AF2"), IOStandard("SSTL12")),
+        Subsignal("cs_n", Pins("AA2"), IOStandard("SSTL12")), # CS0_A_N
+        Subsignal("par", Pins("Y11"), IOStandard("")),
+        Subsignal("ca", Pins("V7 Y7 Y8 V8 W11 V11 Y10"), IOStandard("PODL")),
+        Subsignal("dq", Pins("U6 U5 U7 V6 U1 V3 U2 W3 " +
+                             "V1 W1 V2 Y1 Y2 Y3 AB2 AC2 " +
+                             "Y5 AA4 Y6 AB4 AB6 AC4 AC3 AC6 " +
+                             "AE3 AE2 AD1 AE1 AD4 AD5 AE5 AE6"), IOStandard("SSTL12_T_DCI")),
+        Subsignal("dqs_p", Pins("W6 AB1 AA5 AF5 AC8 W10"), IOStandard("DIFF_SSTL12")), # There are only pins for DQS0_A_P - DQS4_A_P and DQS9_A_P. Possible some placeholders for 5 - 8 should be added
+        Subsignal("dqs_n", Pins("W5 AC1 AB5 AF4 AD8 W9"), IOStandard("DIFF_SSTL12")), # The same as in dqs_p
         Subsignal("dmi", Pins("Y3"), IOStandard("SSTL12_T_DCI")),
         Subsignal("mir", Pins("AA3"), IOStandard("SSTL12")),
         Subsignal("cai", Pins("AB2"), IOStandard("SSTL12")),
