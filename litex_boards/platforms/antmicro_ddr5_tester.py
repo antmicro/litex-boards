@@ -51,7 +51,6 @@ _io = [
                              "AE3 AE2 AD1 AE1 AD4 AD5 AE5 AE6"), IOStandard("SSTL12_T_DCI")),
         Subsignal("dqs_p", Pins("W6 AB1 AA5 AF5 AC8 B17 D19 L19 J15 W10"), IOStandard("DIFF_SSTL12")),
         Subsignal("dqs_n", Pins("W5 AC1 AB5 AF4 AD8 A17 D20 L20 J16 W9"), IOStandard("DIFF_SSTL12")),
-        Subsignal("dmi", Pins("Y3"), IOStandard("SSTL12_T_DCI")),
         Subsignal("mir", Pins("AA3"), IOStandard("SSTL12")),
         Subsignal("cai", Pins("AB2"), IOStandard("SSTL12")),
         Subsignal("ca_odt", Pins("L5"), IOStandard("SSTL12")),
