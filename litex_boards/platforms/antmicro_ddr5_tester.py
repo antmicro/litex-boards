@@ -43,8 +43,8 @@ _io = [
         Subsignal("reset_n", Pins("AF3"), IOStandard("SSTL12")),
         Subsignal("alert_n", Pins("AF2"), IOStandard("SSTL12")),
         Subsignal("cs_n", Pins("AA2"), IOStandard("SSTL12")), # CS0_A_N
-        Subsignal("par", Pins("Y11"), IOStandard("")),
-        Subsignal("ca", Pins("V7 Y7 Y8 V8 W11 V11 Y10"), IOStandard("PODL")),
+        Subsignal("par", Pins("Y11"), IOStandard("SSTL12_DCI")),
+        Subsignal("ca", Pins("V7 Y7 Y8 V8 W11 V11 Y10"), IOStandard("SSTL12")),
         Subsignal("dq", Pins("U6 U5 U7 V6 U1 V3 U2 W3 " +
                              "V1 W1 V2 Y1 Y2 Y3 AB2 AC2 " +
                              "Y5 AA4 Y6 AB4 AB6 AC4 AC3 AC6 " +
