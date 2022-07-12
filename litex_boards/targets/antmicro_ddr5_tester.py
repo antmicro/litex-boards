@@ -90,7 +90,7 @@ class BaseSoC(SoCCore):
                 sys_clk_freq     = sys_clk_freq)
             self.add_sdram("sdram",
                 phy                     = self.ddrphy,
-                module                  = M329R8GA0BB0(sys_clk_freq, "1:8"),
+                module                  = M329R8GA0BB0(sys_clk_freq, "1:4"),
                 l2_cache_size           = kwargs.get("l2_size", 8192),
                 l2_cache_min_data_width = 256,
                 size                    = 0x40000000,
