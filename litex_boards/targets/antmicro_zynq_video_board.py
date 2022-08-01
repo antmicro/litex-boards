@@ -9,7 +9,7 @@ import argparse
 
 from migen import *
 
-from litex_boards.platforms import zynq_video_board
+from litex_boards.platforms import antmicro_zynq_video_board
 from litex.build.xilinx.vivado import vivado_build_args, vivado_build_argdict
 
 from litex.soc.interconnect import axi, wishbone, stream
@@ -201,7 +201,7 @@ class BaseSoC(SoCCore):
     def __init__(self, sys_clk_freq=int(100e6), **kwargs):
        # base_address = 0x43c0_0000
         base_address = 0x0
-        platform = zynq_video_board.Platform()
+        platform = antmicro_zynq_video_board.Platform()
         mem_map = {
             "csr":          0x43c1_0000 - base_address,
         }
