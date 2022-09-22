@@ -38,22 +38,28 @@ _io = [
 
     # Take A channel only
     ("ddr5", 0,
-        Subsignal("clk_p", Pins("AC9"), IOStandard("DIFF_SSTL12")),
-        Subsignal("clk_n", Pins("AD9"), IOStandard("DIFF_SSTL12")),
-        Subsignal("reset_n", Pins("AF3"), IOStandard("SSTL12")),
+        Subsignal("ck_t", Pins("AC9"), IOStandard("DIFF_SSTL12")),
+        Subsignal("ck_c", Pins("AD9"), IOStandard("DIFF_SSTL12")),
+        Subsignal("A_ca", Pins("V7  Y7  Y8  V8   W11  V11  Y10"),  IOStandard("SSTL12")),
+        Subsignal("B_ca", Pins("AF8 AE8 AF9 AF10 AE10 AD10 AE13"), IOStandard("SSTL12")),
+        Subsignal("A_cs_n", Pins("AA2  AA3"),  IOStandard("SSTL12")),
+        Subsignal("B_cs_n", Pins("AC11 AB11"), IOStandard("SSTL12")),
+        Subsignal("A_par", Pins("Y11"),  IOStandard("SSTL12_DCI")),
+        Subsignal("B_par", Pins("AF13"), IOStandard("SSTL12_DCI")),
         Subsignal("alert_n", Pins("AF2"), IOStandard("SSTL12")),
-        Subsignal("cs_n", Pins("AA2"), IOStandard("SSTL12")), # CS0_A_N
-        Subsignal("par", Pins("Y11"), IOStandard("SSTL12_DCI")),
-        Subsignal("ca", Pins("V7 Y7 Y8 V8 W11 V11 Y10"), IOStandard("SSTL12")),
-        Subsignal("dq", Pins("U6 U5 U7 V6 U1 V3 U2 W3 " +
+        Subsignal("reset_n", Pins("AF3"), IOStandard("SSTL12")),
+        Subsignal("A_dq", Pins("U6 U5 U7 V6 U1 V3 U2 W3 " +
                              "V1 W1 V2 Y1 Y2 Y3 AB2 AC2 " +
                              "Y5 AA4 Y6 AB4 AB6 AC4 AC3 AC6 " +
                              "AE3 AE2 AD1 AE1 AD4 AD5 AE5 AE6"), IOStandard("SSTL12_T_DCI")),
-        Subsignal("dqs_p", Pins("W6 AB1 AA5 AF5 AC8 B17 D19 L19 J15 W10"), IOStandard("DIFF_SSTL12")),
-        Subsignal("dqs_n", Pins("W5 AC1 AB5 AF4 AD8 A17 D20 L20 J16 W9"), IOStandard("DIFF_SSTL12")),
-        Subsignal("mir", Pins("AA3"), IOStandard("SSTL12")),
-        Subsignal("cai", Pins("AB2"), IOStandard("SSTL12")),
-        Subsignal("ca_odt", Pins("L5"), IOStandard("SSTL12")),
+        Subsignal("B_dq", Pins("AF14 AE15 AF15 AF17 AE17 AD15 AF19 AF20 " +
+                             "AC14 AA14 AD14 AA15 AB14 AA17 AB15 AA18 " +
+                             "AD18 AD19 AC17 AC18 AB17 AA19 AC19 AA20 " +
+                             "AB20 Y17 W15 W16 V19 V17 V18 V16"), IOStandard("SSTL12_T_DCI")),
+        Subsignal("A_dqs_t", Pins("W6 AB1 AA5 AF5 AC8 B17 D19 L19 J15 W10"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("B_dqs_t", Pins("AE18 Y15 AD20 W18 AE12 R16 P19 T24 M25 AB12"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("A_dqs_c", Pins("W5 AC1 AB5 AF4 AD8 A17 D20 L20 J16 W9"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("B_dqs_c", Pins("AF18 Y16 AE20 W19 AF12 R17 P20 T25 L25 AC12"), IOStandard("DIFF_HSUL_12")),
         Misc("SLEW=FAST"),
     ),
 
