@@ -56,10 +56,10 @@ _io = [
                              "AC14 AA14 AD14 AA15 AB14 AA17 AB15 AA18 " +
                              "AD18 AD19 AC17 AC18 AB17 AA19 AC19 AA20 " +
                              "AB20 Y17 W15 W16 V19 V17 V18 V16"), IOStandard("SSTL12_T_DCI")),
-        Subsignal("A_dqs_t", Pins("W6 AB1 AA5 AF5 AC8 B17 D19 L19 J15 W10"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("B_dqs_t", Pins("AE18 Y15 AD20 W18 AE12 R16 P19 T24 M25 AB12"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("A_dqs_c", Pins("W5 AC1 AB5 AF4 AD8 A17 D20 L20 J16 W9"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("B_dqs_c", Pins("AF18 Y16 AE20 W19 AF12 R17 P20 T25 L25 AC12"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("A_dqs_t", Pins("W6 AB1 AA5 AF5 B17 D19 L19 J15"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("B_dqs_t", Pins("AE18 Y15 AD20 W18 R16 P19 T24 M25"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("A_dqs_c", Pins("W5 AC1 AB5 AF4 A17 D20 L20 J16"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("B_dqs_c", Pins("AF18 Y16 AE20 W19 R17 P20 T25 L25"), IOStandard("DIFF_HSUL_12")),
         Misc("SLEW=FAST"),
     ),
 
