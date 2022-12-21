@@ -24,7 +24,7 @@ from litex.soc.cores.bitbang import I2CMaster
 from litex.soc.cores.video import VideoS7HDMIPHY
 
 from litedram.modules import MTA18ASF2G72PZ
-from litedram.phy.s7ddrphy import A7DDRPHY
+from litedram.phy.s7ddrphy import K7DDRPHY
 from litedram.init import get_sdram_phy_py_header
 from litedram.core.controller import ControllerSettings
 from litedram.common import PhySettings, GeomSettings, TimingSettings
@@ -100,11 +100,12 @@ class BaseSoC(SoCCore):
 
         # DDR4 SDRAM RDIMM -------------------------------------------------------------------------
         if not self.integrated_main_ram_size:
-            self.ddrphy = A7DDRPHY(platform.request("ddr4"),
-                memtype         = "DDR4",
-                iodelay_clk_freq = iodelay_clk_freq,
-                sys_clk_freq     = sys_clk_freq,
-                is_rdimm         = True,
+            self.ddrphy = K7DDRPHY(platform.request("ddr4"),
+                memtype                   = "DDR4",
+                iodelay_clk_freq          = iodelay_clk_freq,
+                sys_clk_freq              = sys_clk_freq,
+                is_rdimm                  = True,
+                write_latency_calibration = True,
             )
             self.add_sdram("sdram",
                 phy                     = self.ddrphy,
