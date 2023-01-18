@@ -143,7 +143,6 @@ class Platform(Xilinx7SeriesPlatform):
 
     def __init__(self, device="xc7k160tffg676-1", toolchain="vivado"):
         Xilinx7SeriesPlatform.__init__(self, device, _io, toolchain=toolchain)
-        XilinxPlatform.__init__(self, device, _io, toolchain=toolchain)
         self.toolchain.bitstream_commands = \
             ["set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]"]
         self.toolchain.additional_commands = \
