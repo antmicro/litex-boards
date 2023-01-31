@@ -48,18 +48,18 @@ _io = [
         Subsignal("B_par", Pins("AF13"), IOStandard("SSTL12_DCI")),
         Subsignal("alert_n", Pins("AF2"), IOStandard("SSTL12")),
         Subsignal("reset_n", Pins("AF3"), IOStandard("SSTL12")),
-        Subsignal("A_dq", Pins("U6 U5 U7 V6 U1 V3 U2 W3 " +
-                             "V1 W1 V2 Y1 Y2 Y3 AB2 AC2 " +
-                             "Y5 AA4 Y6 AB4 AB6 AC4 AC3 AC6 " +
-                             "AE3 AE2 AD1 AE1 AD4 AD5 AE5 AE6"), IOStandard("SSTL12_T_DCI")),
-        Subsignal("B_dq", Pins("AF14 AE15 AF15 AF17 AE17 AD15 AF19 AF20 " +
-                             "AC14 AA14 AD14 AA15 AB14 AA17 AB15 AA18 " +
-                             "AD18 AD19 AC17 AC18 AB17 AA19 AC19 AA20 " +
-                             "AB20 Y17 W15 W16 V19 V17 V18 V16"), IOStandard("SSTL12_T_DCI")),
-        Subsignal("A_dqs_t", Pins("W6 AB1 AA5 AF5 B17 D19 L19 J15"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("B_dqs_t", Pins("AE18 Y15 AD20 W18 R16 P19 T24 M25"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("A_dqs_c", Pins("W5 AC1 AB5 AF4 A17 D20 L20 J16"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("B_dqs_c", Pins("AF18 Y16 AE20 W19 R17 P20 T25 L25"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("A_dq", Pins("  U6   U5   U7   V6",
+                               "  V1   W1   V2   Y1",
+                               "  Y5  AA4   Y6  AB4",
+                               " AE3  AE2  AD1  AE1"), IOStandard("SSTL12_T_DCI")),
+        Subsignal("B_dq", Pins("AF14 AE15 AF15 AF17",
+                               "AC14 AA14 AD14 AA15",
+                               "AD18 AD19 AC17 AC18",
+                               "AB20  Y17  W15  W16"), IOStandard("SSTL12_T_DCI")),
+        Subsignal("A_dqs_t", Pins("  W6  AB1  AA5  AF5"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("B_dqs_t", Pins("AE18  Y15 AD20  W18"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("A_dqs_c", Pins("  W5  AC1  AB5  AF4"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("B_dqs_c", Pins("AF18  Y16 AE20  W19"), IOStandard("DIFF_HSUL_12")),
         Misc("SLEW=FAST"),
     ),
 
@@ -127,7 +127,7 @@ class Platform(Xilinx7SeriesPlatform):
     default_clk_name   = "clk100"
     default_clk_period = 1e9/100e6
 
-    def __init__(self, device="xc7k160tffg676-1", toolchain="vivado"):
+    def __init__(self, device="xc7k160tffg676-3", toolchain="vivado"):
         Xilinx7SeriesPlatform.__init__(self, device, _io, toolchain=toolchain)
         self.toolchain.bitstream_commands = \
             ["set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]"]
