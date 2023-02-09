@@ -56,10 +56,10 @@ _io = [
                                "AC14 AA14 AD14 AA15",
                                "AD18 AD19 AC17 AC18",
                                "AB20  Y17  W15  W16"), IOStandard("SSTL12_T_DCI")),
-        Subsignal("A_dqs_t", Pins("  W6  AB1  AA5  AF5"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("B_dqs_t", Pins("AE18  Y15 AD20  W18"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("A_dqs_c", Pins("  W5  AC1  AB5  AF4"), IOStandard("DIFF_HSUL_12")),
-        Subsignal("B_dqs_c", Pins("AF18  Y16 AE20  W19"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("A_dqs_t", Pins("  W6  AB1  AA5  AF5"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqs_t", Pins("AE18  Y15 AD20  W18"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("A_dqs_c", Pins("  W5  AC1  AB5  AF4"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqs_c", Pins("AF18  Y16 AE20  W19"), IOStandard("DIFF_SSTL12_T_DCI")),
         Misc("SLEW=FAST"),
     ),
 
@@ -110,16 +110,39 @@ _io = [
 
     # HDMI Out
     ("hdmi_out", 0,
-        Subsignal("clk_p",   Pins("B15"),   IOStandard("TMDS_33")),
-        Subsignal("clk_n",   Pins("A15"),   IOStandard("TMDS_33")),
-        Subsignal("data0_p", Pins("B14"),   IOStandard("TMDS_33")),
-        Subsignal("data0_n", Pins("A14"),   IOStandard("TMDS_33")),
+        Subsignal("clk_p",   Pins("B15"),  IOStandard("TMDS_33")),
+        Subsignal("clk_n",   Pins("A15"),  IOStandard("TMDS_33")),
+        Subsignal("data0_p", Pins("B14"),  IOStandard("TMDS_33")),
+        Subsignal("data0_n", Pins("A14"),  IOStandard("TMDS_33")),
         Subsignal("data1_p", Pins("A13"),  IOStandard("TMDS_33")),
         Subsignal("data1_n", Pins("A12"),  IOStandard("TMDS_33")),
         Subsignal("data2_p", Pins("B10"),  IOStandard("TMDS_33")),
         Subsignal("data2_n", Pins("A10"),  IOStandard("TMDS_33")),
     ),
 ]
+
+# TODO: Fill other IOs
+# Must be consistent with _io
+_io_bank = dict(
+    ddr5=dict(
+        ck_t    = ["bank33"],
+        ck_c    = ["bank33"],
+        A_ca    = ["bank33" for _ in range(7)],
+        B_ca    = ["bank33" for _ in range(7)],
+        A_cs_n  = ["bank34" for _ in range(2)],
+        B_cs_n  = ["bank33" for _ in range(2)],
+        A_par   = ["bank33"],
+        B_par   = ["bank33"],
+        alert_n = ["bank34"],
+        reset_n = ["bank34"],
+        A_dq    = ["bank34" for _ in range(16)],
+        B_dq    = ["bank32" for _ in range(16)],
+        A_dqs_t = ["bank34" for _ in range(4)],
+        A_dqs_c = ["bank34" for _ in range(4)],
+        B_dqs_t = ["bank32" for _ in range(4)],
+        B_dqs_c = ["bank32" for _ in range(4)],
+    ),
+)
 
 # Platform -----------------------------------------------------------------------------------------
 
@@ -134,10 +157,13 @@ class Platform(Xilinx7SeriesPlatform):
         self.toolchain.additional_commands = \
             ["write_cfgmem -force -format bin -interface spix4 -size 16 "
              "-loadbit \"up 0x0 {build_name}.bit\" -file {build_name}.bin"]
-        self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 32]")
-        self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 33]")
-        self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 34]")
+        #self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 32]")
+        #self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 33]")
+        #self.add_platform_command("set_property INTERNAL_VREF 0.6 [get_iobanks 34]")
         self.add_platform_command("set_property DCI_CASCADE {{32 34}} [get_iobanks 33]")
+
+    def pin_bank_mapping(self):
+        return _io_bank
 
     def create_programmer(self):
         bscan_spi = "bscan_spi_xc7k160t.bit" if "xc7k160t" in self.device else "bscan_spi_xc7k160t.bit"
