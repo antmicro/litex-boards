@@ -91,6 +91,24 @@ _io = [
     ),
 ]
 
+# TODO: Fill other IOs
+# Must be consistent with _io
+_io_bank = dict(
+    ddr5=dict(
+        ck_t    = ["bank34"],
+        ck_c    = ["bank34"],
+        ca      = ["bank34" for _ in range(14)],
+        cs_n    = ["bank34" for _ in range(1)],
+        par     = ["bank34"],
+        alert_n = ["bank34"],
+        reset_n = ["bank34"],
+        dq      = ["bank34" for _ in range(8)],
+        dm_n    = ["bank34" for _ in range(1)],
+        dqs_t   = ["bank34" for _ in range(1)],
+        dqs_c   = ["bank34" for _ in range(1)],
+    ),
+)
+
 # Platform -----------------------------------------------------------------------------------------
 
 class Platform(Xilinx7SeriesPlatform):
@@ -104,6 +122,9 @@ class Platform(Xilinx7SeriesPlatform):
         self.toolchain.additional_commands = \
             ["write_cfgmem -force -format bin -interface spix4 -size 16 "
              "-loadbit \"up 0x0 {build_name}.bit\" -file {build_name}.bin"]
+
+    def pin_bank_mapping(self):
+        return _io_bank
 
     def create_programmer(self):
         return OpenOCD("openocd_xc7_ft4232.cfg", "bscan_spi_xc7k70t.bit")
