@@ -48,12 +48,12 @@ _io = [
         Subsignal("B_par", Pins("AF13"), IOStandard("SSTL12_DCI")),
         Subsignal("alert_n", Pins("AF2"), IOStandard("SSTL12_DCI")),
         Subsignal("reset_n", Pins("AF3"), IOStandard("SSTL12_DCI")),
-        Subsignal("A_dq", Pins("  U6   U5   U7   V6",
+        Subsignal("A_dq", Pins("  U7   U5   U6   V6",
                                #"  V1   W1   V2   Y1",
                                #"  Y5  AA4   Y6  AB4",
                                #" AE3  AE2  AD1  AE1"
                                ), IOStandard("SSTL12_T_DCI")),
-        Subsignal("B_dq", Pins("AF14 AE15 AF15 AF17",
+        Subsignal("B_dq", Pins("AE15 AF15 AF17 AF14",
                                #"AC14 AA14 AD14 AA15",
                                #"AD18 AD19 AC17 AC18",
                                #"AB20  Y17  W15  W16"
