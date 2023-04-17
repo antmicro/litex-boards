@@ -49,19 +49,23 @@ _io = [
         Subsignal("alert_n", Pins("AF2"), IOStandard("SSTL12_DCI")),
         Subsignal("reset_n", Pins("AF3"), IOStandard("SSTL12_DCI")),
         Subsignal("A_dq", Pins("  U7   U5   U6   V6",
-                               #"  V1   W1   V2   Y1",
-                               #"  Y5  AA4   Y6  AB4",
-                               #" AE3  AE2  AD1  AE1"
+                               "  W1   V2   Y1   V1",
+                               "  Y6  AA4   Y5  AB4",
+                               " AE2  AD1  AE1  AE3"
                                ), IOStandard("SSTL12_T_DCI")),
         Subsignal("B_dq", Pins("AE15 AF15 AF17 AF14",
-                               #"AC14 AA14 AD14 AA15",
-                               #"AD18 AD19 AC17 AC18",
-                               #"AB20  Y17  W15  W16"
+                               "AD14 AA14 AC14 AA15",
+                               "AD19 AC17 AC18 AD18",
+                               " W15  Y17 AB20  W16"
                               ), IOStandard("SSTL12_T_DCI")),
-        Subsignal("A_dqs_t", Pins("  W6"), IOStandard("DIFF_SSTL12_T_DCI")),#  AB1  AA5  AF5"), IOStandard("DIFF_SSTL12_T_DCI")),
-        Subsignal("B_dqs_t", Pins("AE18"), IOStandard("DIFF_SSTL12_T_DCI")),#  Y15 AD20  W18"), IOStandard("DIFF_SSTL12_T_DCI")),
-        Subsignal("A_dqs_c", Pins("  W5"), IOStandard("DIFF_SSTL12_T_DCI")),#  AC1  AB5  AF4"), IOStandard("DIFF_SSTL12_T_DCI")),
-        Subsignal("B_dqs_c", Pins("AF18"), IOStandard("DIFF_SSTL12_T_DCI")),#  Y16 AE20  W19"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("A_dqs_t", Pins("  W6"#), IOStandard("DIFF_SSTL12_T_DCI")),
+"  AB1  AA5  AF5"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqs_t", Pins("AE18"#), IOStandard("DIFF_SSTL12_T_DCI")),
+"  Y15 AD20  W18"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("A_dqs_c", Pins("  W5"#), IOStandard("DIFF_SSTL12_T_DCI")),
+"  AC1  AB5  AF4"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqs_c", Pins("AF18"#), IOStandard("DIFF_SSTL12_T_DCI")),
+"  Y16 AE20  W19"), IOStandard("DIFF_SSTL12_T_DCI")),
         Misc("SLEW=FAST"),
     ),
 
