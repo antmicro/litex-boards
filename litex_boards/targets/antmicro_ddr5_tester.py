@@ -11,7 +11,7 @@ import json
 
 from migen import *
 
-from litex_boards.platforms import antmicro_datacenter_ddr5_tester
+from litex_boards.platforms import antmicro_ddr5_tester
 from litex.build.xilinx.vivado import vivado_build_args, vivado_build_argdict
 
 from litex.soc.cores.clock import *
