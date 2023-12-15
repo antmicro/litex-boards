@@ -36,20 +36,20 @@ _io = [
     ),
 
     ("lpddr5", 0,
-        Subsignal("ck_n", Pins("AB1"), IOStandard("LVDS18")),
-        Subsignal("ck_p", Pins("AA1"), IOStandard("LVDS18")),
-        Subsignal("wck_n", Pins("V2 Y2"), IOStandard("LVDS18")),
-        Subsignal("wck_p", Pins("U2 Y3"), IOStandard("LVDS18")),
-        Subsignal("reset_n", Pins("AB3"), IOStandard("LVDS18")),
-        Subsignal("cs", Pins("U5 T4"), IOStandard("LVDS18")),
-        Subsignal("ca", Pins("Y1 W2 W1 W4 V3 V4 U3"), IOStandard("LVDS18")),
+        Subsignal("ck_n", Pins("AB1"), IOStandard("LVDS")),
+        Subsignal("ck_p", Pins("AA1"), IOStandard("LVDS")),
+        Subsignal("wck_n", Pins("V2 Y2"), IOStandard("LVDS")),
+        Subsignal("wck_p", Pins("U2 Y3"), IOStandard("LVDS")),
+        Subsignal("reset_n", Pins("AB3"), IOStandard("LVCMOS18")),
+        Subsignal("cs", Pins("U5 T4"), IOStandard("LVCMOS18")),
+        Subsignal("ca", Pins("Y1 W2 W1 W4 V3 V4 U3"), IOStandard("LVCMOS18")),
         Subsignal("dq", Pins(
             "N2 M3 L1 K2 K1 K3 N3 L3",
             "P4 R4 P1 P2 R1 R2 T1 U1"
-            ), IOStandard("LVDS18")),
-        Subsignal("rdqs_n", Pins("M1 N4"), IOStandard("LVDS18")),
-        Subsignal("rdqs_p", Pins("M2 M5"), IOStandard("LVDS18")),
-        Subsignal("dmi", Pins("L5 T3"), IOStandard("LVDS18")),
+            ), IOStandard("LVCMOS18")),
+        Subsignal("rdqs_n", Pins("M1 N4"), IOStandard("LVDS")),
+        Subsignal("rdqs_p", Pins("M2 M5"), IOStandard("LVDS")),
+        Subsignal("dmi", Pins("L5 T3"), IOStandard("LVCMOS18")),
      ),
 
     # RGMII Ethernet
