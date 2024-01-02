@@ -42,14 +42,13 @@ _io = [
         Subsignal("wck_p", Pins("U2 Y3"), IOStandard("LVDS")),
         Subsignal("reset_n", Pins("AB3"), IOStandard("LVCMOS18")),
         Subsignal("cs", Pins("U5 T4"), IOStandard("LVCMOS18")),
-        Subsignal("ca", Pins("Y1 W2 W1 W4 V3 V4 U3"), IOStandard("LVCMOS18")),
-        Subsignal("dq", Pins(
-            "N2 M3 L1 K2 K1 K3 N3 L3",
-            "P4 R4 P1 P2 R1 R2 T1 U1"
-            ), IOStandard("LVCMOS18")),
+        Subsignal("ca", Pins("U3 V4 W1 V3 W2 Y1 W4"), IOStandard("LVCMOS18")),
+        Subsignal("dq_in", Pins("K3 K2 K1 L3 N3 N2 M3 L1"), IOStandard("LVCMOS18")),
+        Subsignal("dq_out", Pins( "P1 R1 P2 P4 R4 U1 T1 R2"), IOStandard("LVCMOS18")),
         Subsignal("rdqs_n", Pins("M1 N4"), IOStandard("LVDS")),
         Subsignal("rdqs_p", Pins("M2 M5"), IOStandard("LVDS")),
-        Subsignal("dmi", Pins("L5 T3"), IOStandard("LVCMOS18")),
+        Subsignal("dmi_in", Pins("L5 AA4"), IOStandard("LVCMOS18")),
+        Subsignal("dmi_out", Pins("N5 T3"), IOStandard("LVCMOS18")),
      ),
 
     # RGMII Ethernet
