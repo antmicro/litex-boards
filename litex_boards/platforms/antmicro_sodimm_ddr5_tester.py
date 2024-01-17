@@ -31,19 +31,32 @@ _io = [
     ),
 
     ("lpddr5", 0,
-        Subsignal("ck_n", Pins("Y2"), IOStandard("DIFF_SSTL12")),
-        Subsignal("ck_p", Pins("Y3"), IOStandard("DIFF_SSTL12")),
-        Subsignal("wck_n", Pins("V2 AB1"), IOStandard("DIFF_SSTL12")),
-        Subsignal("wck_p", Pins("U2 AA1"), IOStandard("DIFF_SSTL12")),
-        Subsignal("reset_n", Pins("AB3"), IOStandard("SSTL12")),
-        Subsignal("cs", Pins("V4 U3"), IOStandard("SSTL12")),
-        Subsignal("ca", Pins("T4 U5 W1 V3 W2 Y1 W4"), IOStandard("SSTL12")),
-        Subsignal("dq_in", Pins("K3 K2 K1 L1 N2 N5 N3 M3"), IOStandard("SSTL12")),
-        Subsignal("dq_out", Pins("P1 R1 P2 R2 T3 U1 P4 T1"), IOStandard("SSTL12")),
-        Subsignal("rdqs_n", Pins("M1 N4"), IOStandard("DIFF_SSTL12")),
-        Subsignal("rdqs_p", Pins("M2 M5"), IOStandard("DIFF_SSTL12")),
-        Subsignal("dmi_in", Pins("L3 AA3"), IOStandard("SSTL12")),
-        Subsignal("dmi_out", Pins("L5 AA4"), IOStandard("SSTL12")),
+        Subsignal("A_ck_p", Pins("AB11"), IOStandard("DIFF_SSTL12")),
+        Subsignal("A_ck_n", Pins("AC11"), IOStandard("DIFF_SSTL12")),
+        Subsignal("B_ck_p", Pins("AA10"), IOStandard("DIFF_SSTL12")),
+        Subsignal("B_ck_n", Pins("AB10"), IOStandard("DIFF_SSTL12")),
+        Subsignal("A_wck_p", Pins("Y15 W18"), IOStandard("DIFF_SSTL12")),
+        Subsignal("A_wck_n", Pins("Y16 W19"), IOStandard("DIFF_SSTL12")),
+        Subsignal("B_wck_p", Pins("W6 AA5"), IOStandard("DIFF_SSTL12")),
+        Subsignal("B_wck_n", Pins("W5 AB5"), IOStandard("DIFF_SSTL12")),
+        Subsignal("reset_n", Pins("AF9"), IOStandard("SSTL12")),
+        Subsignal("A_cs", Pins("AA12 AB12"), IOStandard("SSTL12")),
+        Subsignal("B_cs", Pins("Y8 AF10"), IOStandard("SSTL12")),
+        Subsignal("A_ca", Pins("AD11 AC12 AD10 AC13 AC9 AA9 AB9"), IOStandard("SSTL12")),
+        Subsignal("B_ca", Pins("V7 Y7 V8 V9 Y10 Y11 W9"), IOStandard("SSTL12")),
+        Subsignal("A_rdqs_p", Pins("AE18 AD20"), IOStandard("DIFF_SSTL12")),
+        Subsignal("A_rdqs_n", Pins("AF18 AE20"), IOStandard("DIFF_SSTL12")),
+        Subsignal("B_rdqs_p", Pins("AB1 AF5"), IOStandard("DIFF_SSTL12")),
+        Subsignal("B_rdqs_n", Pins("AC1 AF4"), IOStandard("DIFF_SSTL12")),
+        # TODO: Fill out the DQ & DMI mappings
+        # Subsignal("A_dq_in", Pins(""), IOStandard("SSTL12")),
+        # Subsignal("A_dq_out", Pins(""), IOStandard("SSTL12")),
+        # Subsignal("B_dq_in", Pins(""), IOStandard("SSTL12")),
+        # Subsignal("B_dq_out", Pins(""), IOStandard("SSTL12")),
+        # Subsignal("A_dmi_in", Pins(""), IOStandard("SSTL12")),
+        # Subsignal("A_dmi_out", Pins(""), IOStandard("SSTL12")),
+        # Subsignal("B_dmi_in", Pins(""), IOStandard("SSTL12")),
+        # Subsignal("B_dmi_out", Pins(""), IOStandard("SSTL12")),
     ),
 
     ("spiflash4x", 0,  # clock needs to be accessed through STARTUPE2
@@ -109,35 +122,34 @@ _io = [
         Subsignal("data2_n", Pins("A10"),  IOStandard("TMDS_33")),
     ),
 
-    # PCIe
-    ("pcie_x1", 0,
-        Subsignal("rst_n", Pins("E18"), IOStandard("LVCMOS33")),
-        Subsignal("clk_p", Pins("F10")),
-        Subsignal("clk_n", Pins("E10")),
-        Subsignal("rx_p",  Pins("D11")),
-        Subsignal("rx_n",  Pins("C11")),
-        Subsignal("tx_p",  Pins("D5")),
-        Subsignal("tx_n",  Pins("C5"))
-    ),
-    ("pcie_x2", 0,
-        Subsignal("rst_n", Pins("E18"), IOStandard("LVCMOS33")),
-        Subsignal("clk_p", Pins("F10")),
-        Subsignal("clk_n", Pins("E10")),
-        Subsignal("rx_p",  Pins("D11 B10")),
-        Subsignal("rx_n",  Pins("C11 A10")),
-        Subsignal("tx_p",  Pins("D5 B6")),
-        Subsignal("tx_n",  Pins("C5 A6"))
-    ),
-    ("pcie_x4", 0,
-        Subsignal("rst_n", Pins("E18"), IOStandard("LVCMOS33")),
-        Subsignal("clk_p", Pins("F10")),
-        Subsignal("clk_n", Pins("E10")),
-        Subsignal("rx_p",  Pins("D11 B10 D9 B8")),
-        Subsignal("rx_n",  Pins("C11 A10 C9 A8")),
-        Subsignal("tx_p",  Pins("D5 B6 D7 B4")),
-        Subsignal("tx_n",  Pins("C5 A6 C7 A4"))
-    ),
-
+   # PCIe
+   ("pcie_x1", 0,
+       Subsignal("rst_n", Pins("E21"), IOStandard("LVCMOS33")),
+       Subsignal("clk_p", Pins("K6")),
+       Subsignal("clk_n", Pins("K5")),
+       Subsignal("rx_p",  Pins("J4")),
+       Subsignal("rx_n",  Pins("J3")),
+       Subsignal("tx_p",  Pins("H2")),
+       Subsignal("tx_n",  Pins("H1"))
+   ),
+   ("pcie_x2", 0,
+       Subsignal("rst_n", Pins("E21"), IOStandard("LVCMOS33")),
+       Subsignal("clk_p", Pins("K6")),
+       Subsignal("clk_n", Pins("K5")),
+       Subsignal("rx_p",  Pins("J4 L4")),
+       Subsignal("rx_n",  Pins("J3 L3")),
+       Subsignal("tx_p",  Pins("H2 K2")),
+       Subsignal("tx_n",  Pins("H1 K1"))
+   ),
+   ("pcie_x4", 0,
+       Subsignal("rst_n", Pins("E21"), IOStandard("LVCMOS33")),
+       Subsignal("clk_p", Pins("K6")),
+       Subsignal("clk_n", Pins("K5")),
+       Subsignal("rx_p",  Pins("J4 L4 N4 R4")),
+       Subsignal("rx_n",  Pins("J3 L3 N3 R3")),
+       Subsignal("tx_p",  Pins("H2 K2 M2 P2")),
+       Subsignal("tx_n",  Pins("H1 K1 M1 P1"))
+   ),
 ]
 
 # Platform -----------------------------------------------------------------------------------------
@@ -146,7 +158,7 @@ class Platform(Xilinx7SeriesPlatform):
     default_clk_name   = "clk100"
     default_clk_period = 1e9/100e6
 
-    def __init__(self, device="xc7k70tfbg484-3", toolchain="vivado"):
+    def __init__(self, device="xc7k160tffg676-1", toolchain="vivado"):
         Xilinx7SeriesPlatform.__init__(self, device, _io, toolchain=toolchain)
         self.toolchain.bitstream_commands = \
             ["set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]"]
