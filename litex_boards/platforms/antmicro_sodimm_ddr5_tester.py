@@ -57,7 +57,7 @@ _io = [
         Subsignal("A_dq_out",  Pins("AB15 AC14 AB14 AD14",
                                     "AA17 AA18 AB16 AC16",
                                     "V14  V17  V16  V18",
-                                    "Y16  W14  W16  W15"),  IOStandard("SSTL12")),
+                                    "Y17  W14  W16  W15"),  IOStandard("SSTL12")),
         Subsignal("B_dq_in",   Pins("V2  Y2  V1  W1",
                                     "AA2 AB2 Y3  AC2",
                                     "AE5 AF3 AD4 AE6",
