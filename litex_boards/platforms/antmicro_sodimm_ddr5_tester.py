@@ -138,30 +138,30 @@ _io = [
    # PCIe
    ("pcie_x1", 0,
        Subsignal("rst_n", Pins("E21"), IOStandard("LVCMOS33")),
-       Subsignal("clk_p", Pins("K6")),
-       Subsignal("clk_n", Pins("K5")),
-       Subsignal("rx_p",  Pins("J4")),
-       Subsignal("rx_n",  Pins("J3")),
-       Subsignal("tx_p",  Pins("H2")),
-       Subsignal("tx_n",  Pins("H1"))
+       Subsignal("clk_p", Pins("D6")),
+       Subsignal("clk_n", Pins("D5")),
+       Subsignal("rx_p",  Pins("G4")),
+       Subsignal("rx_n",  Pins("G3")),
+       Subsignal("tx_p",  Pins("F2")),
+       Subsignal("tx_n",  Pins("F1"))
    ),
    ("pcie_x2", 0,
        Subsignal("rst_n", Pins("E21"), IOStandard("LVCMOS33")),
-       Subsignal("clk_p", Pins("K6")),
-       Subsignal("clk_n", Pins("K5")),
-       Subsignal("rx_p",  Pins("J4 L4")),
-       Subsignal("rx_n",  Pins("J3 L3")),
-       Subsignal("tx_p",  Pins("H2 K2")),
-       Subsignal("tx_n",  Pins("H1 K1"))
+       Subsignal("clk_p", Pins("D6")),
+       Subsignal("clk_n", Pins("D5")),
+       Subsignal("rx_p",  Pins("G4 E4")),
+       Subsignal("rx_n",  Pins("G3 E3")),
+       Subsignal("tx_p",  Pins("F2 D2")),
+       Subsignal("tx_n",  Pins("F1 D1"))
    ),
    ("pcie_x4", 0,
        Subsignal("rst_n", Pins("E21"), IOStandard("LVCMOS33")),
-       Subsignal("clk_p", Pins("K6")),
-       Subsignal("clk_n", Pins("K5")),
-       Subsignal("rx_p",  Pins("J4 L4 N4 R4")),
-       Subsignal("rx_n",  Pins("J3 L3 N3 R3")),
-       Subsignal("tx_p",  Pins("H2 K2 M2 P2")),
-       Subsignal("tx_n",  Pins("H1 K1 M1 P1"))
+       Subsignal("clk_p", Pins("D6")),
+       Subsignal("clk_n", Pins("D5")),
+       Subsignal("rx_p",  Pins("G4 E4 C4 B6")),
+       Subsignal("rx_n",  Pins("G3 E3 C3 B5")),
+       Subsignal("tx_p",  Pins("F2 D2 B2 A4")),
+       Subsignal("tx_n",  Pins("F1 D1 B1 A3"))
    ),
 ]
 
