@@ -43,12 +43,12 @@ _io = [
         Subsignal("reset_n", Pins("AB3"), IOStandard("SSTL12")),
         Subsignal("cs", Pins("V4 U3"), IOStandard("SSTL12")),
         Subsignal("ca", Pins("T4 U5 W1 V3 W2 Y1 W4"), IOStandard("SSTL12")),
-        Subsignal("dq_in", Pins("K3 K2 K1 L1 N2 N5 N3 M3"), IOStandard("SSTL12")),
-        Subsignal("dq_out", Pins("P1 R1 P2 R2 T3 U1 P4 T1"), IOStandard("SSTL12")),
+        Subsignal("dq_out", Pins("K3 K2 K1 L1 N2 N5 N3 M3"), IOStandard("SSTL12")),
+        Subsignal("dq_in", Pins("P1 R1 P2 R2 T3 U1 P4 T1"), IOStandard("SSTL12")),
         Subsignal("rdqs_n", Pins("M1 N4"), IOStandard("DIFF_SSTL12")),
         Subsignal("rdqs_p", Pins("M2 M5"), IOStandard("DIFF_SSTL12")),
-        Subsignal("dmi_in", Pins("L3 AA3"), IOStandard("SSTL12")),
-        Subsignal("dmi_out", Pins("L5 AA4"), IOStandard("SSTL12")),
+        Subsignal("dmi_out", Pins("L3 AA3"), IOStandard("SSTL12")),
+        Subsignal("dmi_in", Pins("L5 AA4"), IOStandard("SSTL12")),
      ),
 
     # RGMII Ethernet
