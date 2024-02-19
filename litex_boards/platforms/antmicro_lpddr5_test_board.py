@@ -36,19 +36,19 @@ _io = [
     ),
 
     ("lpddr5", 0,
-        Subsignal("ck_n", Pins("Y2"), IOStandard("DIFF_SSTL12")),
-        Subsignal("ck_p", Pins("Y3"), IOStandard("DIFF_SSTL12")),
-        Subsignal("wck_n", Pins("V2"), IOStandard("DIFF_SSTL12")), #  AB1
-        Subsignal("wck_p", Pins("U2"), IOStandard("DIFF_SSTL12")), #  AA1
-        Subsignal("reset_n", Pins("AB3"), IOStandard("SSTL12")),
-        Subsignal("cs", Pins("V4 U3"), IOStandard("SSTL12")),
-        Subsignal("ca", Pins("T4 U5 W1 V3 W2 Y1 W4"), IOStandard("SSTL12")),
-        Subsignal("dq_out", Pins("K3 K2 K1 L1 N2 N5 N3 M3"), IOStandard("SSTL12")),
-        Subsignal("dq_in", Pins("P1 R1 P2 R2 T3 U1 P4 T1"), IOStandard("SSTL12")),
-        Subsignal("rdqs_n", Pins("M1"), IOStandard("DIFF_SSTL12")), # N4
-        Subsignal("rdqs_p", Pins("M2"), IOStandard("DIFF_SSTL12")), # M5
-        Subsignal("dmi_out", Pins("L3 AA3"), IOStandard("SSTL12")),
-        Subsignal("dmi_in", Pins("L5 AA4"), IOStandard("SSTL12")),
+        Subsignal("ck_n", Pins("Y2"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("ck_p", Pins("Y3"), IOStandard("DIFF_HSUL_12")),
+        Subsignal("wck_n", Pins("V2"), IOStandard("DIFF_HSUL_12")), #  AB1
+        Subsignal("wck_p", Pins("U2"), IOStandard("DIFF_HSUL_12")), #  AA1
+        Subsignal("reset_n", Pins("AB3"), IOStandard("HSUL_12")),
+        Subsignal("cs", Pins("V4 U3"), IOStandard("HSUL_12")),
+        Subsignal("ca", Pins("T4 U5 W1 V3 W2 Y1 W4"), IOStandard("HSUL_12")),
+        Subsignal("dq_out", Pins("K3 K2 K1 L1 N2 N5 N3 M3"), IOStandard("HSUL_12")),
+        Subsignal("dq_in", Pins("P1 R1 P2 R2 T3 U1 P4 T1"), IOStandard("HSUL_12")),
+        Subsignal("rdqs_n", Pins("M1"), IOStandard("DIFF_HSUL_12")), # N4
+        Subsignal("rdqs_p", Pins("M2"), IOStandard("DIFF_HSUL_12")), # M5
+        Subsignal("dmi_out", Pins("L3 AA3"), IOStandard("HSUL_12")),
+        Subsignal("dmi_in", Pins("L5 AA4"), IOStandard("HSUL_12")),
      ),
 
     # RGMII Ethernet
