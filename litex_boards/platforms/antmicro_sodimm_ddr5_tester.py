@@ -19,11 +19,6 @@ _io = [
     ("user_led", 3, Pins("C22"), IOStandard("LVCMOS33")),
     ("user_led", 4, Pins("E22"), IOStandard("LVCMOS33")),
 
-    ("user_btn", 0, Pins("C21"), IOStandard("LVCMOS33")),
-    ("user_btn", 1, Pins("A20"), IOStandard("LVCMOS33")),
-    ("user_btn", 2, Pins("E21"), IOStandard("LVCMOS33")),
-    ("user_btn", 3, Pins("D23"), IOStandard("LVCMOS33")),
-
     ("serial", 0,
         Subsignal("tx", Pins("E26")),
         Subsignal("rx", Pins("F25")),
