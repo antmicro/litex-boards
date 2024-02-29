@@ -28,8 +28,6 @@ _io = [
     # _IN  <=> FPGA -> MEM
     # _OUT <=> MEM -> FPGA
     ("lpddr5", 0,
-        Subsignal("pwr_en",   Pins("AC21"),               IOStandard("LVCMOS33")),
-        Subsignal("pwr_good", Pins("AD21"),               Misc("PULLUP True"), IOStandard("LVCMOS33")),
         Subsignal("ck_p",    Pins("AB11"),                IOStandard("DIFF_SSTL12")),
         Subsignal("ck_n",    Pins("AC11"),                IOStandard("DIFF_SSTL12")),
         # Subsignal("B_ck_p",    Pins("AA10"),                IOStandard("DIFF_SSTL12")),
@@ -116,11 +114,22 @@ _io = [
     ),
 
     # I2C
-    ("i2c", 0,
+    ("i2c_ddr", 0,
         Subsignal("scl", Pins("E25")),
         Subsignal("sda", Pins("D26")),
         IOStandard("LVCMOS33"),
     ),
+    ("i2c_platform", 0,
+        Subsignal("scl", Pins("H22")),
+        Subsignal("sda", Pins("G24")),
+        IOStandard("LVCMOS33"),
+    ),
+
+    # SO-DIMM signals
+    ("pwr_en",   Pins("AC21"), IOStandard("LVCMOS33"),),
+    ("pwr_good", Pins("AD21"), Misc("PULLUP True"), IOStandard("LVCMOS33"),),
+    ("tb_detect", 0, Pins("AE21"), IOStandard("LVCMOS33"),),
+    ("ddr_presence_n", 0, Pins("AF22"), IOStandard("LVCMOS33"),),
 
     # HDMI Out
     ("hdmi_out", 0,
