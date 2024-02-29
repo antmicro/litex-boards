@@ -29,6 +29,7 @@ _io = [
     # _OUT <=> MEM -> FPGA
     ("lpddr5", 0,
         Subsignal("pwr_en",   Pins("AD8"),                IOStandard("SSTL12")),
+        Subsignal("pwr_good", Pins("AE10"),                IOStandard("SSTL12")),
         Subsignal("ck_p",    Pins("AB11"),                IOStandard("DIFF_SSTL12")),
         Subsignal("ck_n",    Pins("AC11"),                IOStandard("DIFF_SSTL12")),
         # Subsignal("B_ck_p",    Pins("AA10"),                IOStandard("DIFF_SSTL12")),
