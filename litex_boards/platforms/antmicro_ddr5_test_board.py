@@ -99,7 +99,6 @@ _io_bank = dict(
         ck_c    = ["bank34"],
         ca      = ["bank34" for _ in range(14)],
         cs_n    = ["bank34" for _ in range(1)],
-        par     = ["bank34"],
         alert_n = ["bank34"],
         reset_n = ["bank34"],
         dq      = ["bank34" for _ in range(8)],
