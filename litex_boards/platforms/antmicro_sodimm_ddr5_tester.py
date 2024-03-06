@@ -184,6 +184,9 @@ _io = [
     ("pwr_good", 0, Pins("AD21"), Misc("PULLUP True"), IOStandard("LVCMOS33"),),
     ("tb_detect", 0, Pins("AE21"), IOStandard("LVCMOS33"),),
     ("ddr_presence_n", 0, Pins("AF22"), IOStandard("LVCMOS33"),),
+    ("LED_yellow", 0, Pins("A20"), IOStandard("LVCMOS33"),),
+    ("LED_red", 0, Pins("E21"), IOStandard("LVCMOS33"),),
+    ("LED_green", 0, Pins("D23"), IOStandard("LVCMOS33"),),
 
     # HDMI Out
     ("hdmi_out", 0,
