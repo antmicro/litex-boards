@@ -110,17 +110,97 @@ _io = [
 
     ("ddr_presence_n", 0,   Pins("AD13"), IOStandard("LVCMOS33"),),
 
+    # PCIe
+    # TODO: verify lane order
+    ("pcie_x1", 0,
+       Subsignal("rst_n", Pins("A10"), IOStandard("LVCMOS33")),
+       Subsignal("clk_p", Pins("AB7")),
+       Subsignal("clk_n", Pins("AB6")),
+       Subsignal("rx_p",  Pins("AF2")),
+       Subsignal("rx_n",  Pins("AF1")),
+       Subsignal("tx_p",  Pins("AF7")),
+       Subsignal("tx_n",  Pins("AF6"))
+    ),
+    ("pcie_x2", 0,
+       Subsignal("rst_n", Pins("A10"), IOStandard("LVCMOS33")),
+       Subsignal("clk_p", Pins("AB7")),
+       Subsignal("clk_n", Pins("AB6")),
+       Subsignal("rx_p",  Pins("AF2 AE4")),
+       Subsignal("rx_n",  Pins("AF1 AE3")),
+       Subsignal("tx_p",  Pins("AF7 AE9")),
+       Subsignal("tx_n",  Pins("AF6 AE8"))
+    ),
+    ("pcie_x4", 0,
+       Subsignal("rst_n", Pins("A10"), IOStandard("LVCMOS33")),
+       Subsignal("clk_p", Pins("AB7")),
+       Subsignal("clk_n", Pins("AB6")),
+       Subsignal("rx_p",  Pins("AF2 AE4 AD2 AB2")),
+       Subsignal("rx_n",  Pins("AF1 AE3 AD1 AB1")),
+       Subsignal("tx_p",  Pins("AF7 AE9 AD7 AC5")),
+       Subsignal("tx_n",  Pins("AF6 AE8 AD6 AC4"))
+    ),
+    ("pcie_x8", 0,
+       Subsignal("rst_n", Pins("A10"), IOStandard("LVCMOS33")),
+       Subsignal("clk_p", Pins("AB7")),
+       Subsignal("clk_n", Pins("AB6")),
+       Subsignal("rx_p",  Pins("AF2 AE4 AD2 AB2 Y2 V2 T2 P2")),
+       Subsignal("rx_n",  Pins("AF1 AE3 AD1 AB1 Y1 V1 T1 P1")),
+       Subsignal("tx_p",  Pins("AF7 AE9 AD7 AC5 AA5 W5 U5 R5")),
+       Subsignal("tx_n",  Pins("AF6 AE8 AD6 AC4 AA4 W4 U4 R4"))
+    ),
+
+    # HDMI
+    ("hdmi_out", 0,
+        Subsignal("clk_p",   Pins("G5")),
+        Subsignal("clk_n",   Pins("G4")),
+        Subsignal("data0_p", Pins("N5")),
+        Subsignal("data0_n", Pins("N4")),
+        Subsignal("data1_p", Pins("L5")),
+        Subsignal("data1_n", Pins("L4")),
+        Subsignal("data2_p", Pins("J5")),
+        Subsignal("data2_n", Pins("J4")),
+        Subsignal("sda",     Pins("J13"), IOStandard("LVCMOS33")),
+        Subsignal("scl",     Pins("H13"), IOStandard("LVCMOS33")),
+        Subsignal("hpd",     Pins("C13"), IOStandard("LVCMOS33")),
+        Subsignal("cd",      Pins("A14"), IOStandard("LVCMOS33")),
+        Subsignal("txen",    Pins("C12"), IOStandard("LVCMOS33"))
+    ),
+
+    ("hdmi_in", 0,
+        Subsignal("clk_p",   Pins("M7")),
+        Subsignal("clk_n",   Pins("M6")),
+        Subsignal("data0_p", Pins("M1")),
+        Subsignal("data0_n", Pins("M2")),
+        Subsignal("data1_p", Pins("K1")),
+        Subsignal("data1_n", Pins("K1")),
+        Subsignal("data2_p", Pins("H1")),
+        Subsignal("data2_n", Pins("H2")),
+        Subsignal("sda",     Pins("J12"), IOStandard("LVCMOS33")),
+        Subsignal("scl",     Pins("H12"), IOStandard("LVCMOS33")),
+        Subsignal("hpd",     Pins("B12"), IOStandard("LVCMOS33"))
+    ),
+
     ("si5319_ctl", 0,
         Subsignal("int_cb", Pins("A12")),
         Subsignal("lol",    Pins("B14")),
         Subsignal("rst_n",  Pins("B14")),
-        IOSta
+        Subsignal("sda",    Pins("H14")),
+        Subsignal("scl",    Pins("G14")),
+        IOStandard("LVCMOS33")
+    ),
+
+    # AUX JTAG
+    ("jtag_aux", 0,
+        Subsignal("rst" Pins("D10")), 
+        Subsignal("tms" Pins("D9")), 
+        Subsignal("tck" Pins("C9")), 
+        Subsignal("tdi" Pins("B9")), 
+        Subsignal("tdo" Pins("A9")), 
+        IOStandard("LVCMOS33")
     )
 
-    # TODO: Add PCIe
-    # TODO: Add HDMI
+
     # TODO: Add DDR
-    # TODO: Add AUX_JTAG
     # TODO: Add I3C
 ]
 
