@@ -114,7 +114,8 @@ _io = [
         Subsignal("int_cb", Pins("A12")),
         Subsignal("lol",    Pins("B14")),
         Subsignal("rst_n",  Pins("B14")),
-    ),
+        IOSta
+    )
 
     # TODO: Add PCIe
     # TODO: Add HDMI
@@ -122,3 +123,23 @@ _io = [
     # TODO: Add AUX_JTAG
     # TODO: Add I3C
 ]
+
+class Platform(XilinxUSPPlatform):
+    default_clk_name = "clk100"
+    default_clk_period = 1e9/100e6
+
+    def __init__(self, device="xcau25p-", toolchain="vivado"):
+        XilinxUSPPlatform.__init__(self, device, _io, toolchain=toolchain)
+        self.toolchain.bitstream_commands = \
+            ["set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]"]
+        self.toolchain.additional_commands = \
+            ["write_cfgmem -force -format bin -interface spix4 -size 16 "
+             "-loadbit \"up 0x0 {build_name}.bit\" -file {build_name}.bin"]
+
+    def create_programmer(self):
+        pass #TODO:
+
+    def do_finalize(self, fragment):
+        XilinxUSPPlatform.do_finalize(self, fragment)
+        self.add_period_constraint(self.lookup_request("clk100", loose=True), 1e9/100e6)
+
