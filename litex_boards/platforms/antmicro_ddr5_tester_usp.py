@@ -199,8 +199,50 @@ _io = [
         IOStandard("LVCMOS33")
     )
 
-
-    # TODO: Add DDR
+    # DDR
+    # TODO: change to POD12
+    ("ddr5", 0,
+        Subsignal("ck_t", Pins("W26"),  IOStandard("DIFF_SSTL12_DCI")), #TODO: possible bug in polarity on PCB
+        Subsignal("ck_c", Pins("W25"),  IOStandard("DIFF_SSTL12_DCI")),
+        Subsignal("A_ca",   Pins("W23 V23 AA24 AA25 Y25 Y26 V24")),
+        Subsignal("B_ca",   Pins("U25 R25 T25  P26  P25 P24 N24")),
+        Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19")),
+        Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21")),
+        Subsignal("A_cs_n", Pins("Y22 Y23"),
+        Subsignal("B_cs_n", Pins("T24 U25")),
+        Subsignal("alert_n", Pins("AA23")),
+        Subsignal("reset_n", Pins("T19")),
+        Subsignal("pgood",   Pins("N26")),
+        Subsignal("A_dq", Pins("AA19 AA20 AB19 AB20 AA18 Y18  AA17 Y17",
+                               "AF18 AF19 AC19 AD19 AE16 AD16 AF17 AE17",
+                               "AD23 AE23 AC22 AC23 AD21 DE21 DB21 AC21",
+                               "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
+                               ),
+        Subsignal("B_dq", Pins("M21 M20 J19 J20 K21 K20 L20 J21",
+                               "M26 M25 K26 K25 J24 K23 J23 K22",
+                               "H23 J25 H24 J26 G26 H22 H26 H21",
+                               "F23 D24 E23 D25 B26 B25 C26 D26"
+                              ),
+        Subsignal("A_dqs_t", Pins("Y20  AD20 AE22 AE25",
+                                  "AB17 AC18 AA22 AC26"
+                                 ), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqs_t", Pins("L18 L22 G24 E25",
+                                  "M19 L24 F24 D23"
+                                ), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("A_dqs_c", Pins("Y21  AE20 AF22 AE26",
+                                  "AC17 AD18 AB22 AD26"
+                                 ), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqs_c", Pins("K18 L23 G25 E26",
+                                  "L19 L25 F25 C24",
+                                 ), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("A_dqsb_t", Pins("U19 V21"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqsb_t", Pins("N23 R22"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("A_dqsb_c", Pins("V19 V22"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("B_dqsb_c", Pins("P23 R23"), IOStandard("DIFF_SSTL12_T_DCI")),
+        Subsignal("dlbdq",  Pins("U26")),
+        Subsignal("dlbdqs", Pins("V26")),
+        Misc("SLEW=FAST")
+    )
     # TODO: Add I3C
 ]
 
