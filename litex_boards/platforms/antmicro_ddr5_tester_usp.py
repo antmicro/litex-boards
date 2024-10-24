@@ -12,7 +12,7 @@ from litex.build.openocd import OpenOCD
 
 _io = [
     # Clocking
-    ("clk100", 0
+    ("clk100", 0,
         Subsignal("p", Pins("B19")),
         Subsignal("n", Pins("B20")),
         IOStandard("LVDS")
@@ -44,7 +44,7 @@ _io = [
         Subsignal("clk",  Pins("Y11")), #TODO: Maybe only accessible via STARTUPE3, verify
         Subsignal("dq",   Pins("AD11", "AC12", "AC11", "AE11")),
         IOStandard("LVCMOS18")
-    )
+    ),
 
     # RGMII Ethernet
     ("eth_ref_clk", 0, Pins("B24"), IOStandard("LVCMOS18")),
@@ -86,13 +86,13 @@ _io = [
     ),
 
     # I2C
-    ("i2c", 0
+    ("i2c", 0,
         Subsignal("sda", Pins("W14"), IOStandard("LVCMOS33")),
         Subsignal("scl", Pins("W15"), IOStandard("LVCMOS33")),
         IOStandard("LVCMOS33")
     ),
 
-    ("i2c_platform", 0
+    ("i2c_platform", 0,
         Subsignal("sda", Pins("W12"), IOStandard("LVCMOS33")),
         Subsignal("scl", Pins("W13"), IOStandard("LVCMOS33")),
         IOStandard("LVCMOS33")
@@ -108,7 +108,7 @@ _io = [
     ("fpga_power_off",   0, Pins("Y15"),  IOStandard("LVCMOS33")),
     ("fan_pwm",          0, Pins("AA14"), IOStandard("LVCMOS33")),
 
-    ("ddr_presence_n", 0,   Pins("AD13"), IOStandard("LVCMOS33"),),
+    ("ddr_presence_n", 0,   Pins("AD13"), IOStandard("LVCMOS33")),
 
     # PCIe
     # TODO: verify lane order
@@ -191,16 +191,15 @@ _io = [
 
     # AUX JTAG
     ("jtag_aux", 0,
-        Subsignal("rst" Pins("D10")), 
-        Subsignal("tms" Pins("D9")), 
-        Subsignal("tck" Pins("C9")), 
-        Subsignal("tdi" Pins("B9")), 
-        Subsignal("tdo" Pins("A9")), 
+        Subsignal("rst", Pins("D10")), 
+        Subsignal("tms", Pins("D9")), 
+        Subsignal("tck", Pins("C9")), 
+        Subsignal("tdi", Pins("B9")), 
+        Subsignal("tdo", Pins("A9")), 
         IOStandard("LVCMOS33")
-    )
+    ),
 
     # DDR
-    # TODO: change to POD12
     ("ddr5", 0,
         Subsignal("ck_t", Pins("W26"),  IOStandard("DIFF_POD12_DCI")), #TODO: possible bug in polarity on PCB
         Subsignal("ck_c", Pins("W25"),  IOStandard("DIFF_POD12_DCI")),
@@ -208,7 +207,7 @@ _io = [
         Subsignal("B_ca",   Pins("U25 R25 T25  P26  P25 P24 N24")),
         Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19")),
         Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21")),
-        Subsignal("A_cs_n", Pins("Y22 Y23"),
+        Subsignal("A_cs_n", Pins("Y22 Y23")),
         Subsignal("B_cs_n", Pins("T24 U25")),
         Subsignal("alert_n", Pins("AA23")),
         Subsignal("reset_n", Pins("T19")),
@@ -217,12 +216,12 @@ _io = [
                                "AF18 AF19 AC19 AD19 AE16 AD16 AF17 AE17",
                                "AD23 AE23 AC22 AC23 AD21 AE21 AB21 AC21",
                                "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
-                               ),
+                               )),
         Subsignal("B_dq", Pins("M21 M20 J19 J20 K21 K20 L20 J21",
                                "M26 M25 K26 K25 J24 K23 J23 K22",
                                "H23 J25 H24 J26 G26 H22 H26 H21",
                                "F23 D24 E23 D25 B26 B25 C26 D26"
-                              ),
+                              )),
         Subsignal("A_dqs_t", Pins("Y20  AD20 AE22 AE25",
                                   "AB17 AC18 AA22 AC26"
                                  ), IOStandard("DIFF_POD12_DCI")),
@@ -241,7 +240,7 @@ _io = [
         Subsignal("B_dqsb_c", Pins("P23 R23"), IOStandard("DIFF_POD12_DCI")),
         Subsignal("dlbdq",  Pins("U26")),
         Subsignal("dlbdqs", Pins("V26")),
-        IOStandard("POD12_DCI")
+        IOStandard("POD12_DCI"),
         Misc("SLEW=FAST")
     )
     # TODO: Add I3C
