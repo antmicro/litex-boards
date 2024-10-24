@@ -215,7 +215,7 @@ _io = [
         Subsignal("pgood",   Pins("N26")),
         Subsignal("A_dq", Pins("AA19 AA20 AB19 AB20 AA18 Y18  AA17 Y17",
                                "AF18 AF19 AC19 AD19 AE16 AD16 AF17 AE17",
-                               "AD23 AE23 AC22 AC23 AD21 DE21 DB21 AC21",
+                               "AD23 AE23 AC22 AC23 AD21 AE21 AB21 AC21",
                                "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
                                ),
         Subsignal("B_dq", Pins("M21 M20 J19 J20 K21 K20 L20 J21",
