@@ -41,12 +41,12 @@ class _CRG(Module):
 
         # # #
 
-        # Clk.
+        # Clk
         clk100 = platform.request("clk100")
 
-        self.submodules.pll = pll = USPPLL(speedgrade=-1)
+        self.submodules.pll = pll = USPMMCM(speedgrade=-1)
         pll.register_clkin(clk100, 100e6)
-        pll.create_clkout(self.cd_sys,       sys_clk_freq)
+        pll.create_clkout(self.cd_sys,       sys_clk_freq, with_reset=False)
         pll.create_clkout(self.cd_sys2x,     2 * sys_clk_freq)
         pll.create_clkout(self.cd_sys8x,     8 * sys_clk_freq)
         pll.create_clkout(self.cd_idelay,    iodelay_clk_freq)
@@ -195,10 +195,10 @@ def main():
     builder = Builder(soc, **builder_argdict(args))
     if args.build:
         builder.build(**vivado_build_argdict(args))
-        builder.soc.generate_sdram_phy_py_header(os.path.join(builder.output_dir, "sdram_init.py"))
+        #builder.soc.generate_sdram_phy_py_header(os.path.join(builder.output_dir, "sdram_init.py"))
         # LiteDRAM settings (controller, phy, geom, timing)
-        with open(os.path.join(builder.output_dir, 'litedram_settings.json'), 'w') as f:
-            json.dump(builder.soc.sdram.controller.settings, f, cls=LiteDRAMSettingsEncoder, indent=4)
+        #with open(os.path.join(builder.output_dir, 'litedram_settings.json'), 'w') as f:
+        #    json.dump(builder.soc.sdram.controller.settings, f, cls=LiteDRAMSettingsEncoder, indent=4)
 
     if args.load:
         prog = soc.platform.create_programmer()
