@@ -105,7 +105,11 @@ class BaseSoC(SoCCore):
 
         A_ca = ddr5_pads.A_ca
         A_cs = ddr5_pads.A_cs_n
-        CC_perm = Cat(A_cs[0], A_cs[1], A_ca[4], A_ca[5], A_ca[2], A_ca[3], A_ca[1], A_ca[0], A_ca[6], A_ca[7])
+        CC_A_perm = Cat(A_cs[0], A_cs[1], A_ca[4], A_ca[5], A_ca[2], A_ca[3], A_ca[1], A_ca[0], A_ca[6], A_ca[7])
+
+        B_ca = ddr5_pads.B_ca
+        B_cs = ddr5_pads.B_cs_n
+        CC_B_perm = Cat(B_cs[0], B_cs[1], B_ca[2], B_ca[0], B_ca[6], B_ca[5], B_ca[4], B_ca[3], B_ca[1], B_ca[7])
 
         self.platform.add_source("ddr5phy_usp.sv")
         self.specials += Instance("ddr5_usp_phy",
@@ -124,7 +128,8 @@ class BaseSoC(SoCCore):
                 io_B_dqsb_t_pads = ddr5_pads.B_dqsb_t,
                 io_B_dqsb_c_pads = ddr5_pads.B_dqsb_c,
 
-                o_A_cc_pads = CC_perm,
+                o_A_cc_pads = CC_A_perm,
+                o_B_cc_pads = CC_B_perm,
                 o_ck_t_pad = ddr5_pads.ck_t,
                 o_ck_c_pad = ddr5_pads.ck_c
             )
