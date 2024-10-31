@@ -73,65 +73,104 @@ class BaseSoC(SoCCore):
 
         # Remapping of data pins so that they align with appriopriate BITSLICEs
         # TODO: platform specific, probably should be somehow moved to platform.py
-        A_dq = ddr5_pads.A_dq
-        A_dq_perm = Cat( A_dq[0],  A_dq[2],  A_dq[1],  A_dq[3],
-                A_dq[7],  A_dq[6],  A_dq[5],  A_dq[4],
-                A_dq[10], A_dq[11], A_dq[8],  A_dq[9],
-                A_dq[15], A_dq[14], A_dq[13], A_dq[12],
-                A_dq[16], A_dq[17], A_dq[18], A_dq[19],
-                A_dq[20], A_dq[21], A_dq[22], A_dq[23],
-                A_dq[24], A_dq[26], A_dq[25], A_dq[27],
-                A_dq[28], A_dq[30], A_dq[31], A_dq[29],
-          )
+        #A_dq = ddr5_pads.A_dq
+        #A_dq_perm = Cat( A_dq[0],  A_dq[2],  A_dq[1],  A_dq[3],
+        #        A_dq[7],  A_dq[6],  A_dq[5],  A_dq[4],
+        #        A_dq[10], A_dq[11], A_dq[8],  A_dq[9],
+        #        A_dq[15], A_dq[14], A_dq[13], A_dq[12],
+        #        A_dq[16], A_dq[17], A_dq[18], A_dq[19],
+        #        A_dq[20], A_dq[21], A_dq[22], A_dq[23],
+        #        A_dq[24], A_dq[26], A_dq[25], A_dq[27],
+        #        A_dq[28], A_dq[30], A_dq[31], A_dq[29],
+        #  )
 
-        B_dq = ddr5_pads.B_dq
-        B_dq_perm = Cat( B_dq[1],  B_dq[0],  B_dq[2],  B_dq[3],
-                B_dq[4],  B_dq[7],  B_dq[6],  B_dq[5],
-                B_dq[9],  B_dq[8],  B_dq[11], B_dq[10],
-                B_dq[15], B_dq[13], B_dq[14], B_dq[12],
-                B_dq[16], B_dq[18], B_dq[17], B_dq[19],
-                B_dq[22], B_dq[20], B_dq[23], B_dq[21],
-                B_dq[24], B_dq[26], B_dq[25], B_dq[27],
-                B_dq[31], B_dq[30], B_dq[29], B_dq[28],
-          )
+        #B_dq = ddr5_pads.B_dq
+        #B_dq_perm = Cat( B_dq[1],  B_dq[0],  B_dq[2],  B_dq[3],
+        #        B_dq[4],  B_dq[7],  B_dq[6],  B_dq[5],
+        #        B_dq[9],  B_dq[8],  B_dq[11], B_dq[10],
+        #        B_dq[15], B_dq[13], B_dq[14], B_dq[12],
+        #        B_dq[16], B_dq[18], B_dq[17], B_dq[19],
+        #        B_dq[22], B_dq[20], B_dq[23], B_dq[21],
+        #        B_dq[24], B_dq[26], B_dq[25], B_dq[27],
+        #        B_dq[31], B_dq[30], B_dq[29], B_dq[28],
+        #  )
 
-        A_cb = ddr5_pads.A_cb
-        A_cb_perm = Cat(A_cb[1], A_cb[0], A_cb[2], A_cb[3],
-                A_cb[6], A_cb[4], A_cb[7], A_cb[5])
+        #A_cb = ddr5_pads.A_cb
+        #A_cb_perm = Cat(A_cb[1], A_cb[0], A_cb[2], A_cb[3],
+        #        A_cb[6], A_cb[4], A_cb[7], A_cb[5])
 
-        B_cb = ddr5_pads.B_cb
-        B_cb_perm = Cat(B_cb[3], B_cb[0], B_cb[1], B_cb[2],
-                B_cb[4], B_cb[7], B_cb[6], B_cb[5])
+        #B_cb = ddr5_pads.B_cb
+        #B_cb_perm = Cat(B_cb[3], B_cb[0], B_cb[1], B_cb[2],
+        #        B_cb[4], B_cb[7], B_cb[6], B_cb[5])
 
-        A_ca = ddr5_pads.A_ca
-        A_cs = ddr5_pads.A_cs_n
-        CC_A_perm = Cat(A_cs[0], A_cs[1], A_ca[4], A_ca[5], A_ca[2], A_ca[3], A_ca[1], A_ca[0], A_ca[6], A_ca[7])
+        # Bitslice lane numbers, probably should be moved to platform
+        A_dq_lanes = Instance.PreformattedParam("{2, 4, 3, 5, "
+                                                 "5, 4, 3, 2, "
+                                                 "4, 5, 2, 3, "
+                                                 "5, 4, 3, 2, "
+                                                 "2, 3, 4, 5, "
+                                                 "2, 3, 4, 5, "
+                                                 "2, 4, 3, 5, "
+                                                 "2, 5, 3, 4"
+                                                "}")
+        B_dq_lanes = Instance.PreformattedParam("{3, 2, 4, 5, "
+                                                 "2, 5, 4, 3, "
+                                                 "3, 2, 5, 4, "
+                                                 "5, 3, 4, 2, "
+                                                 "2, 4, 3, 5, "
+                                                 "3, 5, 2, 4, "
+                                                 "2, 4, 3, 5, "
+                                                 "5, 4, 3, 2  "
+                                                "}")
+        A_dqs_lanes = Instance.PreformattedParam("{0, 0, 0, 0, 0, 0, 0, 0}")
+        B_dqs_lanes = Instance.PreformattedParam("{0, 0, 0, 0, 0, 0, 0, 0}")
 
-        B_ca = ddr5_pads.B_ca
-        B_cs = ddr5_pads.B_cs_n
-        CC_B_perm = Cat(B_cs[0], B_cs[1], B_ca[2], B_ca[0], B_ca[6], B_ca[5], B_ca[4], B_ca[3], B_ca[1], B_ca[7])
+        A_cb_lanes = Instance.PreformattedParam("{3, 2, 4, 5, "
+                                                 "3, 5, 2, 4  "
+                                                "}")
+        B_cb_lanes = Instance.PreformattedParam("{3, 4, 5, 2, "
+                                                 "2, 5, 4, 3  "
+                                                "}")
+        A_dqsb_lanes = Instance.PreformattedParam("{0, 0}")
+        B_dqsb_lanes = Instance.PreformattedParam("{0, 0}")
+
+        #                                         CA0    CA1   CA2   CA3   CA4   CA5   CA6   PAR   CS0   CS1
+        A_cc_lanes = Instance.PreformattedParam("{7+3,   7+2,  0+4,  0+5,  0+2,  0+3,  7+4,  7+5,  0+0,  0+1}")
+        B_cc_lanes = Instance.PreformattedParam("{14+3, 21+4, 14+2, 21+3, 21+2, 14+5, 14+4, 21+5, 14+0, 14+1}")
+        ck_lane = C(7)
 
         self.platform.add_source("ddr5phy_usp.sv")
         self.specials += Instance("ddr5_usp_phy",
                 i_sys_clk        = ClockSignal("sys"),
-                io_A_dq_pads     = A_dq_perm,
+                io_A_dq_pads     = ddr5_pads.A_dq,
                 io_A_dqs_t_pads  = ddr5_pads.A_dqs_t,
                 io_A_dqs_c_pads  = ddr5_pads.A_dqs_c,
-                io_A_cb_pads     = A_cb_perm,
+                io_A_cb_pads     = ddr5_pads.A_cb,
                 io_A_dqsb_t_pads = ddr5_pads.A_dqsb_t,
                 io_A_dqsb_c_pads = ddr5_pads.A_dqsb_c,
+                p_A_DQ_BITSLICE_LANES = A_dq_lanes,
+                p_A_DQS_BITSLICE_LANES = A_dqs_lanes,
 
-                io_B_dq_pads     = B_dq_perm,
+                io_B_dq_pads     = ddr5_pads.B_dq,
                 io_B_dqs_t_pads  = ddr5_pads.B_dqs_t,
                 io_B_dqs_c_pads  = ddr5_pads.B_dqs_c,
-                io_B_cb_pads     = B_cb_perm,
+                io_B_cb_pads     = ddr5_pads.B_cb,
                 io_B_dqsb_t_pads = ddr5_pads.B_dqsb_t,
                 io_B_dqsb_c_pads = ddr5_pads.B_dqsb_c,
+                p_B_DQ_BITSLICE_LANES = B_dq_lanes,
+                p_B_DQS_BITSLICE_LANES = B_dqs_lanes,
+                p_A_CB_BITSLICE_LANES = A_cb_lanes,
+                p_B_CB_BITSLICE_LANES = B_cb_lanes,
+                p_A_DQSB_BITSLICE_LANES = A_dqsb_lanes,
+                p_B_DQSB_BITSLICE_LANES = B_dqsb_lanes,
 
-                o_A_cc_pads = CC_A_perm,
-                o_B_cc_pads = CC_B_perm,
+                o_A_cc_pads = Cat(ddr5_pads.A_ca, ddr5_pads.A_cs_n),
+                o_B_cc_pads = Cat(ddr5_pads.B_ca, ddr5_pads.B_cs_n),
                 o_ck_t_pad = ddr5_pads.ck_t,
-                o_ck_c_pad = ddr5_pads.ck_c
+                o_ck_c_pad = ddr5_pads.ck_c,
+                p_A_CC_BITSLICE_LANES = A_cc_lanes,
+                p_B_CC_BITSLICE_LANES = B_cc_lanes,
+                p_CK_BITSLICE_LANE = ck_lane
             )
 
         if False:
