@@ -8,6 +8,7 @@
 import os
 import math
 import json
+import pathlib
 
 from migen import *
 
@@ -139,7 +140,7 @@ class BaseSoC(SoCCore):
         B_cc_lanes = Instance.PreformattedParam("{14+3, 21+4, 14+2, 21+3, 21+2, 14+5, 14+4, 21+5, 14+0, 14+1}")
         ck_lane = C(7)
 
-        self.platform.add_source("ddr5phy_usp.sv")
+        self.platform.add_source(pathlib.Path(__file__).parent / "ddr5phy_usp.sv")
         self.specials += Instance("ddr5_usp_phy",
                 i_sys_clk        = ClockSignal("sys"),
                 io_A_dq_pads     = ddr5_pads.A_dq,
