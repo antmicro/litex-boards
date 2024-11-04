@@ -72,38 +72,6 @@ class BaseSoC(SoCCore):
         # DDR5 SDRAM RDIMM -------------------------------------------------------------------------
         ddr5_pads = platform.request("ddr5")
 
-        # Remapping of data pins so that they align with appriopriate BITSLICEs
-        # TODO: platform specific, probably should be somehow moved to platform.py
-        #A_dq = ddr5_pads.A_dq
-        #A_dq_perm = Cat( A_dq[0],  A_dq[2],  A_dq[1],  A_dq[3],
-        #        A_dq[7],  A_dq[6],  A_dq[5],  A_dq[4],
-        #        A_dq[10], A_dq[11], A_dq[8],  A_dq[9],
-        #        A_dq[15], A_dq[14], A_dq[13], A_dq[12],
-        #        A_dq[16], A_dq[17], A_dq[18], A_dq[19],
-        #        A_dq[20], A_dq[21], A_dq[22], A_dq[23],
-        #        A_dq[24], A_dq[26], A_dq[25], A_dq[27],
-        #        A_dq[28], A_dq[30], A_dq[31], A_dq[29],
-        #  )
-
-        #B_dq = ddr5_pads.B_dq
-        #B_dq_perm = Cat( B_dq[1],  B_dq[0],  B_dq[2],  B_dq[3],
-        #        B_dq[4],  B_dq[7],  B_dq[6],  B_dq[5],
-        #        B_dq[9],  B_dq[8],  B_dq[11], B_dq[10],
-        #        B_dq[15], B_dq[13], B_dq[14], B_dq[12],
-        #        B_dq[16], B_dq[18], B_dq[17], B_dq[19],
-        #        B_dq[22], B_dq[20], B_dq[23], B_dq[21],
-        #        B_dq[24], B_dq[26], B_dq[25], B_dq[27],
-        #        B_dq[31], B_dq[30], B_dq[29], B_dq[28],
-        #  )
-
-        #A_cb = ddr5_pads.A_cb
-        #A_cb_perm = Cat(A_cb[1], A_cb[0], A_cb[2], A_cb[3],
-        #        A_cb[6], A_cb[4], A_cb[7], A_cb[5])
-
-        #B_cb = ddr5_pads.B_cb
-        #B_cb_perm = Cat(B_cb[3], B_cb[0], B_cb[1], B_cb[2],
-        #        B_cb[4], B_cb[7], B_cb[6], B_cb[5])
-
         # Bitslice lane numbers, probably should be moved to platform
         A_dq_lanes = Instance.PreformattedParam("{2, 4, 3, 5, "
                                                  "5, 4, 3, 2, "

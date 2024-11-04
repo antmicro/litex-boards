@@ -327,6 +327,9 @@ module ddr5_usp_phy_cc
 endmodule
 
 // DQ/CB nibble PHY
+// BITSLICE lanes need to be defined for each signal
+// BITSLICE lanes are numered from 0 to 6 for each nibble 
+// Lane 0 is typically used by DQS while lanes 2 to 5 by DQ signals
 module ddr5_usp_phy_nibble
         #(
             parameter integer DQ_BITSLICE_LANES[4] = {2, 3, 4, 5},
