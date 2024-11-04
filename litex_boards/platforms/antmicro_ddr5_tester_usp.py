@@ -111,7 +111,6 @@ _io = [
     ("ddr_presence_n", 0,   Pins("AD13"), IOStandard("LVCMOS33")),
 
     # PCIe
-    # TODO: verify lane order
     ("pcie_x1", 0,
        Subsignal("rst_n", Pins("A10"), IOStandard("LVCMOS33")),
        Subsignal("clk_p", Pins("AB7")),
@@ -201,14 +200,14 @@ _io = [
 
     # DDR
     ("ddr5", 0,
-        Subsignal("ck_t", Pins("W26"),  IOStandard("DIFF_POD12_DCI")), #TODO: possible bug in polarity on PCB
-        Subsignal("ck_c", Pins("W25"),  IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_ca",   Pins("W23 V23 AA24 AA25 Y25 Y26 V24")),
-        Subsignal("B_ca",   Pins("U25 R25 T25  P26  P25 P24 N24")),
+        Subsignal("ck_t", Pins("W25"),  IOStandard("DIFF_POD12_DCI")),
+        Subsignal("ck_c", Pins("W26"),  IOStandard("DIFF_POD12_DCI")),
+        Subsignal("A_ca",   Pins("W23 V23 AA24 AA25 Y25 Y26 V24 W24")), # Last bit is PAR
+        Subsignal("B_ca",   Pins("U25 R25 T25  P26  P25 P24 N24 R26")),
         Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19")),
         Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21")),
         Subsignal("A_cs_n", Pins("Y22 Y23")),
-        Subsignal("B_cs_n", Pins("T24 U25")),
+        Subsignal("B_cs_n", Pins("T24 U24")),
         Subsignal("alert_n", Pins("AA23")),
         Subsignal("reset_n", Pins("T19")),
         Subsignal("pgood",   Pins("N26")),
