@@ -69,6 +69,66 @@ class BaseSoC(SoCCore):
         SoCCore.__init__(self, platform, sys_clk_freq, ident="LiteX SoC on DDR5 Tester Ultrascale+", **kwargs)
 
         # DDR5 SDRAM RDIMM -------------------------------------------------------------------------
+        ddr5_pads = platform.request("ddr5")
+
+        # Remapping of data pins so that they align with appriopriate BITSLICEs
+        # TODO: platform specific, probably should be somehow moved to platform.py
+        A_dq = ddr5_pads.A_dq
+        A_dq_perm = Cat( A_dq[0],  A_dq[2],  A_dq[1],  A_dq[3],
+                A_dq[7],  A_dq[6],  A_dq[5],  A_dq[4],
+                A_dq[10], A_dq[11], A_dq[8],  A_dq[9],
+                A_dq[15], A_dq[14], A_dq[13], A_dq[12],
+                A_dq[16], A_dq[17], A_dq[18], A_dq[19],
+                A_dq[20], A_dq[21], A_dq[22], A_dq[23],
+                A_dq[24], A_dq[26], A_dq[25], A_dq[27],
+                A_dq[28], A_dq[30], A_dq[31], A_dq[29],
+          )
+
+        B_dq = ddr5_pads.B_dq
+        B_dq_perm = Cat( B_dq[1],  B_dq[0],  B_dq[2],  B_dq[3],
+                B_dq[4],  B_dq[7],  B_dq[6],  B_dq[5],
+                B_dq[9],  B_dq[8],  B_dq[11], B_dq[10],
+                B_dq[15], B_dq[13], B_dq[14], B_dq[12],
+                B_dq[16], B_dq[18], B_dq[17], B_dq[19],
+                B_dq[22], B_dq[20], B_dq[23], B_dq[21],
+                B_dq[24], B_dq[26], B_dq[25], B_dq[27],
+                B_dq[31], B_dq[30], B_dq[29], B_dq[28],
+          )
+
+        A_cb = ddr5_pads.A_cb
+        A_cb_perm = Cat(A_cb[1], A_cb[0], A_cb[2], A_cb[3],
+                A_cb[6], A_cb[4], A_cb[7], A_cb[5])
+
+        B_cb = ddr5_pads.B_cb
+        B_cb_perm = Cat(B_cb[3], B_cb[0], B_cb[1], B_cb[2],
+                B_cb[4], B_cb[7], B_cb[6], B_cb[5])
+
+        A_ca = ddr5_pads.A_ca
+        A_cs = ddr5_pads.A_cs_n
+        CC_perm = Cat(A_cs[0], A_cs[1], A_ca[4], A_ca[5], A_ca[2], A_ca[3], A_ca[1], A_ca[0], A_ca[6], A_ca[7])
+
+        self.platform.add_source("ddr5phy_usp.sv")
+        self.specials += Instance("ddr5_usp_phy",
+                i_sys_clk        = ClockSignal("sys"),
+                io_A_dq_pads     = A_dq_perm,
+                io_A_dqs_t_pads  = ddr5_pads.A_dqs_t,
+                io_A_dqs_c_pads  = ddr5_pads.A_dqs_c,
+                io_A_cb_pads     = A_cb_perm,
+                io_A_dqsb_t_pads = ddr5_pads.A_dqsb_t,
+                io_A_dqsb_c_pads = ddr5_pads.A_dqsb_c,
+
+                io_B_dq_pads     = B_dq_perm,
+                io_B_dqs_t_pads  = ddr5_pads.B_dqs_t,
+                io_B_dqs_c_pads  = ddr5_pads.B_dqs_c,
+                io_B_cb_pads     = B_cb_perm,
+                io_B_dqsb_t_pads = ddr5_pads.B_dqsb_t,
+                io_B_dqsb_c_pads = ddr5_pads.B_dqsb_c,
+
+                o_A_cc_pads = CC_perm,
+                o_ck_t_pad = ddr5_pads.ck_t,
+                o_ck_c_pad = ddr5_pads.ck_c
+            )
+
         if False:
             if not self.integrated_main_ram_size:
                 self.submodules.ddrphy = K7DDR5PHY(platform.request("ddr5"),
