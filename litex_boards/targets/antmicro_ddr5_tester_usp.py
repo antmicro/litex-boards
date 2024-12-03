@@ -66,7 +66,7 @@ class BaseSoC(SoCCore):
         self.submodules.crg = _CRG(platform, sys_clk_freq, iodelay_clk_freq=iodelay_clk_freq)
 
         # SoCCore ----------------------------------------------------------------------------------
-        SoCCore.__init__(self, platform, sys_clk_freq, ident="LiteX SoC on ddr5 Tester", **kwargs)
+        SoCCore.__init__(self, platform, sys_clk_freq, ident="LiteX SoC on DDR5 Tester Ultrascale+", **kwargs)
 
         # DDR5 SDRAM RDIMM -------------------------------------------------------------------------
         if False:
@@ -100,7 +100,7 @@ class BaseSoC(SoCCore):
                 clock_pads = self.platform.request("eth_clocks"),
                 pads       = self.platform.request("eth"),
                 rx_delay   = 0.8e-9,
-                hw_reset_cycles = math.ceil(float(eth_reset_time) * self.sys_clk_freq)
+                usp = True
             )
             if with_ethernet:
                 self.add_ethernet(phy=self.ethphy, dynamic_ip=eth_dynamic_ip)

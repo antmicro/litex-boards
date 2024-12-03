@@ -256,6 +256,9 @@ class Platform(XilinxUSPPlatform):
         self.toolchain.additional_commands = \
             ["write_cfgmem -force -format bin -interface spix4 -size 16 "
              "-loadbit \"up 0x0 {build_name}.bit\" -file {build_name}.bin"]
+        self.toolchain.pre_placement_commands.add("set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets IBUF/O]") # Needed since RXC for ETH is not GC
+        self.toolchain.pre_placement_commands.add("set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports eth_tx_data[3]]")
+        self.toolchain.pre_placement_commands.add("set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets main_crg_clkin_BUFG]")
 
     def create_programmer(self):
         pass #TODO:
@@ -263,4 +266,5 @@ class Platform(XilinxUSPPlatform):
     def do_finalize(self, fragment):
         XilinxUSPPlatform.do_finalize(self, fragment)
         self.add_period_constraint(self.lookup_request("clk100", loose=True), 1e9/100e6)
+        self.add_period_constraint(self.lookup_request("eth_clocks_rx", loose=True), 1e9/125e6)
 
