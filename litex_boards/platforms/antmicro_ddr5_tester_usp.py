@@ -190,24 +190,24 @@ _io = [
 
     # AUX JTAG
     ("jtag_aux", 0,
-        Subsignal("rst", Pins("D10")), 
-        Subsignal("tms", Pins("D9")), 
-        Subsignal("tck", Pins("C9")), 
-        Subsignal("tdi", Pins("B9")), 
-        Subsignal("tdo", Pins("A9")), 
+        Subsignal("rst", Pins("D10")),
+        Subsignal("tms", Pins("D9")),
+        Subsignal("tck", Pins("C9")),
+        Subsignal("tdi", Pins("B9")),
+        Subsignal("tdo", Pins("A9")),
         IOStandard("LVCMOS33")
     ),
 
     # DDR
     ("ddr5", 0,
-        Subsignal("ck_t", Pins("W25"),  IOStandard("DIFF_POD12_DCI")),
-        Subsignal("ck_c", Pins("W26"),  IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_ca",   Pins("W23 V23 AA24 AA25 Y25 Y26 V24 W24")), # Last bit is PAR
-        Subsignal("B_ca",   Pins("U25 R25 T25  P26  P25 P24 N24 R26")),
-        Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19")),
-        Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21")),
+        Subsignal("ck_t",  Pins("W25"),  IOStandard("DIFF_POD12_DCI")),
+        Subsignal("ck_c",  Pins("W26"),  IOStandard("DIFF_POD12_DCI")),
+        Subsignal("A_ca",  Pins("W23 V23 AA24 AA25 Y25 Y26 V24")), # Last bit is PAR
+        Subsignal("B_ca",  Pins("U25 R25 T25  P26  P25 P24 N24")),
         Subsignal("A_cs_n", Pins("Y22 Y23")),
         Subsignal("B_cs_n", Pins("T24 U24")),
+        Subsignal("A_par", Pins("W24")),
+        Subsignal("B_par", Pins("R26")),
         Subsignal("alert_n", Pins("AA23")),
         Subsignal("reset_n", Pins("T19")),
         Subsignal("pgood",   Pins("N26")),
@@ -216,26 +216,28 @@ _io = [
                                "AD23 AE23 AC22 AC23 AD21 AE21 AB21 AC21",
                                "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
                                )),
+        Subsignal("A_dqs_t", Pins("Y20  AD20 AE22 AE25",
+                                  "AB17 AC18 AA22 AC26"
+                                 ), IOStandard("DIFF_POD12_DCI")),
+        Subsignal("A_dqs_c", Pins("Y21  AE20 AF22 AE26",
+                                  "AC17 AD18 AB22 AD26"
+                                 ), IOStandard("DIFF_POD12_DCI")),
+        Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19")),
+        Subsignal("A_dqsb_t", Pins("U19 V21"), IOStandard("DIFF_POD12_DCI")),
+        Subsignal("A_dqsb_c", Pins("V19 V22"), IOStandard("DIFF_POD12_DCI")),
         Subsignal("B_dq", Pins("M21 M20 J19 J20 K21 K20 L20 J21",
                                "M26 M25 K26 K25 J24 K23 J23 K22",
                                "H23 J25 H24 J26 G26 H22 H26 H21",
                                "F23 D24 E23 D25 B26 B25 C26 D26"
                               )),
-        Subsignal("A_dqs_t", Pins("Y20  AD20 AE22 AE25",
-                                  "AB17 AC18 AA22 AC26"
-                                 ), IOStandard("DIFF_POD12_DCI")),
         Subsignal("B_dqs_t", Pins("L18 L22 G24 E25",
                                   "M19 L24 F24 D23"
                                 ), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_dqs_c", Pins("Y21  AE20 AF22 AE26",
-                                  "AC17 AD18 AB22 AD26"
-                                 ), IOStandard("DIFF_POD12_DCI")),
         Subsignal("B_dqs_c", Pins("K18 L23 G25 E26",
                                   "L19 L25 F25 C24",
                                  ), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_dqsb_t", Pins("U19 V21"), IOStandard("DIFF_POD12_DCI")),
+        Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21")),
         Subsignal("B_dqsb_t", Pins("N23 R22"), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_dqsb_c", Pins("V19 V22"), IOStandard("DIFF_POD12_DCI")),
         Subsignal("B_dqsb_c", Pins("P23 R23"), IOStandard("DIFF_POD12_DCI")),
         Subsignal("dlbdq",  Pins("U26")),
         Subsignal("dlbdqs", Pins("V26")),
@@ -244,6 +246,52 @@ _io = [
     )
     # TODO: Add I3C
 ]
+
+# TODO: Fill other IOs
+# Must be consistent with _io
+# Each tuple has following format: bank #, byte #, nibble(1 - upper, 0 - lower), bitslice
+_io_bank = dict(
+    ddr5=dict(
+        ck_t    = [(65, 1, 1, 0)],
+        ck_c    = [(65, 1, 1, 1)],
+        A_ca    = [(65, 1, nibble, bitslice) for nibble, bitslice in [
+            (1, 3), (1, 2), (0, 4), (0, 5), (0, 2), (0, 3), (1, 4)]],
+        B_ca    = [(65, 2, nibble, bitslice) for nibble, bitslice in [
+            (0, 3), (1, 4), (0, 2), (1, 3), (1, 2), (0, 5), (0, 4)]],
+        A_cs_n  = [(65, 1, nibble, bitslice) for nibble, bitslice in [(0, 0), (0, 1)]],
+        B_cs_n  = [(65, 2, nibble, bitslice) for nibble, bitslice in [(0, 0), (0, 1)]],
+        A_par   = [(65, 1, 1, 5)],
+        B_par   = [(65, 2, 1, 5)],
+        alert_n = [(65, 1, 1, 6)],
+        reset_n = [(65, 3, 1, 6)],
+        A_dq    = [(64, byte, nibble, bitslice) for byte, nibble, bitslice in [
+            (3, 0, 2), (3, 0, 4), (3, 0, 3), (3, 0, 5), (3, 1, 5), (3, 1, 4), (3, 1, 3), (3, 1, 2),
+            (2, 0, 4), (2, 0, 5), (2, 0, 2), (2, 0, 3), (2, 1, 5), (2, 1, 4), (2, 1, 3), (2, 1, 2),
+            (1, 0, 2), (1, 0, 3), (1, 0, 4), (1, 0, 5), (1, 1, 2), (1, 1, 3), (1, 1, 4), (1, 1, 5),
+            (0, 0, 2), (0, 0, 4), (0, 0, 3), (0, 0, 5), (0, 1, 2), (0, 1, 5), (0, 1, 3), (0, 1, 4)]],
+        B_dq    = [(66, byte, nibble, bitslice) for byte, nibble, bitslice in [
+            (0, 0, 3), (0, 0, 2), (0, 0, 4), (0, 0, 5), (0, 1, 2), (0, 1, 5), (0, 1, 4), (0, 1, 3),
+            (1, 0, 3), (1, 0, 2), (1, 0, 5), (1, 0, 4), (1, 1, 5), (1, 1, 3), (1, 1, 4), (1, 1, 2),
+            (2, 0, 2), (2, 0, 4), (2, 0, 3), (2, 0, 5), (2, 1, 3), (2, 1, 5), (2, 1, 2), (2, 1, 4),
+            (3, 0, 2), (3, 0, 4), (3, 0, 3), (3, 0, 5), (3, 1, 5), (3, 1, 4), (3, 1, 3), (3, 1, 2)]],
+        A_dqs_t = [(64, byte, nibble, bitslice) for byte, nibble, bitslice in [
+            (3, 0, 0), (2, 0, 0), (1, 0, 0), (0, 0, 0), (3, 1, 0), (2, 1, 0), (1, 1, 0), (0, 1, 0)]],
+        A_dqs_c = [(64, byte, nibble, bitslice) for byte, nibble, bitslice in [
+            (3, 0, 1), (2, 0, 1), (1, 0, 1), (0, 0, 1), (3, 1, 1), (2, 1, 1), (1, 1, 1), (0, 1, 1)]],
+        B_dqs_t = [(66, byte, nibble, bitslice) for byte, nibble, bitslice in [
+            (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0), (0, 1, 0), (1, 1, 0), (2, 1, 0), (3, 1, 0)]],
+        B_dqs_c = [(66, byte, nibble, bitslice) for byte, nibble, bitslice in [
+            (0, 0, 1), (1, 0, 1), (2, 0, 1), (3, 0, 1), (0, 1, 1), (1, 1, 1), (2, 1, 1), (3, 1, 1)]],
+        A_cb    = [(65, 0, nibble, bitslice) for nibble, bitslice in [
+            (0, 3), (0, 2), (0, 4), (0, 5), (1, 3), (1, 5), (1, 2), (1, 4)]],
+        B_cb    = [(65, 3, nibble, bitslice) for nibble, bitslice in [
+            (1, 3), (1, 4), (1, 5), (1, 2), (0, 2), (0, 5), (0, 4), (0, 3)]],
+        A_dqsb_t = [(65, 0, nibble, bitslice) for nibble, bitslice in [(0, 0), (1, 0)]],
+        A_dqsb_c = [(65, 0, nibble, bitslice) for nibble, bitslice in [(0, 1), (1, 1)]],
+        B_dqsb_t = [(65, 3, nibble, bitslice) for nibble, bitslice in [(1, 0), (0, 0)]],
+        B_dqsb_c = [(65, 3, nibble, bitslice) for nibble, bitslice in [(1, 1), (0, 1)]],
+    ),
+)
 
 class Platform(XilinxUSPPlatform):
     default_clk_name = "clk100"
@@ -258,7 +306,9 @@ class Platform(XilinxUSPPlatform):
              "-loadbit \"up 0x0 {build_name}.bit\" -file {build_name}.bin"]
         self.toolchain.pre_placement_commands.add("set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets IBUF/O]") # Needed since RXC for ETH is not GC
         self.toolchain.pre_placement_commands.add("set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports eth_tx_data[3]]")
-        self.toolchain.pre_placement_commands.add("set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets main_crg_clkin_BUFG]")
+
+    def pin_bank_byte_nibble_bitslice_mapping(self):
+        return _io_bank
 
     def create_programmer(self):
         pass #TODO:
