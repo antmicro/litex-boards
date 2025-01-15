@@ -216,12 +216,16 @@ _io = [
                                "AD23 AE23 AC22 AC23 AD21 AE21 AB21 AC21",
                                "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
                                )),
-        Subsignal("A_dqs_t", Pins("Y20  AD20 AE22 AE25",
-                                  "AB17 AC18 AA22 AC26"
-                                 ), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_dqs_c", Pins("Y21  AE20 AF22 AE26",
-                                  "AC17 AD18 AB22 AD26"
-                                 ), IOStandard("DIFF_POD12_DCI")),
+        Subsignal(
+            "A_dqs_t",
+            Pins("Y20  AB17 AD20 AC18 AE22 AA22 AE25 AC26"),
+            IOStandard("DIFF_POD12_DCI")
+        ),
+        Subsignal(
+            "A_dqs_c",
+            Pins("Y21  AC17 AE20 AD18 AF22 AB22 AE26 AD26"),
+            IOStandard("DIFF_POD12_DCI")
+        ),
         Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19")),
         Subsignal("A_dqsb_t", Pins("U19 V21"), IOStandard("DIFF_POD12_DCI")),
         Subsignal("A_dqsb_c", Pins("V19 V22"), IOStandard("DIFF_POD12_DCI")),
@@ -230,12 +234,16 @@ _io = [
                                "H23 J25 H24 J26 G26 H22 H26 H21",
                                "F23 D24 E23 D25 B26 B25 C26 D26"
                               )),
-        Subsignal("B_dqs_t", Pins("L18 L22 G24 E25",
-                                  "M19 L24 F24 D23"
-                                ), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("B_dqs_c", Pins("K18 L23 G25 E26",
-                                  "L19 L25 F25 C24",
-                                 ), IOStandard("DIFF_POD12_DCI")),
+        Subsignal(
+            "B_dqs_t",
+            Pins("L18 M19 L22 L24 G24 F24 E25 D23"),
+            IOStandard("DIFF_POD12_DCI")
+        ),
+        Subsignal(
+            "B_dqs_c",
+            Pins("K18 L19 L23 L25 G25 F25 E26 C24"),
+            IOStandard("DIFF_POD12_DCI")
+        ),
         Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21")),
         Subsignal("B_dqsb_t", Pins("N23 R22"), IOStandard("DIFF_POD12_DCI")),
         Subsignal("B_dqsb_c", Pins("P23 R23"), IOStandard("DIFF_POD12_DCI")),
@@ -275,13 +283,13 @@ _io_bank = dict(
             (2, 0, 2), (2, 0, 4), (2, 0, 3), (2, 0, 5), (2, 1, 3), (2, 1, 5), (2, 1, 2), (2, 1, 4),
             (3, 0, 2), (3, 0, 4), (3, 0, 3), (3, 0, 5), (3, 1, 5), (3, 1, 4), (3, 1, 3), (3, 1, 2)]],
         A_dqs_t = [(64, byte, nibble, bitslice) for byte, nibble, bitslice in [
-            (3, 0, 0), (2, 0, 0), (1, 0, 0), (0, 0, 0), (3, 1, 0), (2, 1, 0), (1, 1, 0), (0, 1, 0)]],
+            (3, 0, 0), (3, 1, 0), (2, 0, 0), (2, 1, 0), (1, 0, 0), (1, 1, 0), (0, 0, 0), (0, 1, 0)]],
         A_dqs_c = [(64, byte, nibble, bitslice) for byte, nibble, bitslice in [
-            (3, 0, 1), (2, 0, 1), (1, 0, 1), (0, 0, 1), (3, 1, 1), (2, 1, 1), (1, 1, 1), (0, 1, 1)]],
+            (3, 0, 1), (3, 1, 1), (2, 0, 1), (2, 1, 1), (1, 0, 1), (1, 1, 1), (0, 0, 1), (0, 1, 1)]],
         B_dqs_t = [(66, byte, nibble, bitslice) for byte, nibble, bitslice in [
-            (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0), (0, 1, 0), (1, 1, 0), (2, 1, 0), (3, 1, 0)]],
+            (0, 0, 0), (0, 1, 0), (1, 0, 0), (1, 1, 0), (2, 0, 0), (2, 1, 0), (3, 0, 0), (3, 1, 0)]],
         B_dqs_c = [(66, byte, nibble, bitslice) for byte, nibble, bitslice in [
-            (0, 0, 1), (1, 0, 1), (2, 0, 1), (3, 0, 1), (0, 1, 1), (1, 1, 1), (2, 1, 1), (3, 1, 1)]],
+            (0, 0, 1), (0, 1, 1), (1, 0, 1), (1, 1, 1), (2, 0, 1), (2, 1, 1), (3, 0, 1), (3, 1, 1)]],
         A_cb    = [(65, 0, nibble, bitslice) for nibble, bitslice in [
             (0, 3), (0, 2), (0, 4), (0, 5), (1, 3), (1, 5), (1, 2), (1, 4)]],
         B_cb    = [(65, 3, nibble, bitslice) for nibble, bitslice in [
