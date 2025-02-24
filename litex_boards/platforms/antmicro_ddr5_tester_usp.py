@@ -109,6 +109,8 @@ _io = [
     ("fan_pwm",          0, Pins("AA14"), IOStandard("LVCMOS33")),
 
     ("ddr_presence_n", 0,   Pins("AD13"), IOStandard("LVCMOS33")),
+    ("vin_bulk_en", 0, Pins("AD15"), IOStandard("LVCMOS33")),
+    ("vin_mgmt_en", 0, Pins("AD14"), IOStandard("LVCMOS33")),
 
     # PCIe
     ("pcie_x1", 0,
@@ -202,20 +204,24 @@ _io = [
     ("ddr5", 0,
         Subsignal("ck_t",  Pins("W25"),  IOStandard("DIFF_POD12_DCI")),
         Subsignal("ck_c",  Pins("W26"),  IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_ca",  Pins("W23 V23 AA24 AA25 Y25 Y26 V24")), # Last bit is PAR
-        Subsignal("B_ca",  Pins("U25 R25 T25  P26  P25 P24 N24")),
-        Subsignal("A_cs_n", Pins("Y22 Y23")),
-        Subsignal("B_cs_n", Pins("T24 U24")),
-        Subsignal("A_par", Pins("W24")),
-        Subsignal("B_par", Pins("R26")),
-        Subsignal("alert_n", Pins("AA23")),
-        Subsignal("reset_n", Pins("T19")),
-        Subsignal("pgood",   Pins("N26")),
-        Subsignal("A_dq", Pins("AA19 AA20 AB19 AB20 AA18 Y18  AA17 Y17",
-                               "AF18 AF19 AC19 AD19 AE16 AD16 AF17 AE17",
-                               "AD23 AE23 AC22 AC23 AD21 AE21 AB21 AC21",
-                               "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
-                               )),
+        Subsignal("A_ca",  Pins("W23 V23 AA24 AA25 Y25 Y26 V24"), IOStandard("POD12_DCI")),
+        Subsignal("B_ca",  Pins("U25 R25 T25  P26  P25 P24 N24"), IOStandard("POD12_DCI")),
+        Subsignal("A_cs_n", Pins("Y22 Y23"), IOStandard("POD12_DCI")),
+        Subsignal("B_cs_n", Pins("T24 U24"), IOStandard("POD12_DCI")),
+        Subsignal("A_par", Pins("W24"), IOStandard("POD12_DCI")),
+        Subsignal("B_par", Pins("R26"), IOStandard("POD12_DCI")),
+        Subsignal("alert_n", Pins("AA23"), IOStandard("POD12_DCI")),
+        Subsignal("reset_n", Pins("T19"), IOStandard("POD12_DCI")),
+        #Subsignal("pgood",   Pins("N26"), IOStandard("POD12_DCI")), Unused at this point
+        Subsignal("A_dq",
+            Pins(
+                "AA19 AA20 AB19 AB20 AA18 Y18  AA17 Y17",
+                "AF18 AF19 AC19 AD19 AE16 AD16 AF17 AE17",
+                "AD23 AE23 AC22 AC23 AD21 AE21 AB21 AC21",
+                "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
+            ),
+            IOStandard("POD12_DCI")
+        ),
         Subsignal(
             "A_dqs_t",
             Pins("Y20  AB17 AD20 AC18 AE22 AA22 AE25 AC26"),
@@ -226,14 +232,19 @@ _io = [
             Pins("Y21  AC17 AE20 AD18 AF22 AB22 AE26 AD26"),
             IOStandard("DIFF_POD12_DCI")
         ),
-        Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19")),
-        Subsignal("A_dqsb_t", Pins("U19 V21"), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_dqsb_c", Pins("V19 V22"), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("B_dq", Pins("M21 M20 J19 J20 K21 K20 L20 J21",
-                               "M26 M25 K26 K25 J24 K23 J23 K22",
-                               "H23 J25 H24 J26 G26 H22 H26 H21",
-                               "F23 D24 E23 D25 B26 B25 C26 D26"
-                              )),
+        # Unused at this point
+        #Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19"), IOStandard("POD12_DCI")),
+        #Subsignal("A_dqsb_t", Pins("U19 V21"), IOStandard("DIFF_POD12_DCI")),
+        #Subsignal("A_dqsb_c", Pins("V19 V22"), IOStandard("DIFF_POD12_DCI")),
+        Subsignal("B_dq",
+            Pins(
+                "M21 M20 J19 J20 K21 K20 L20 J21",
+                "M26 M25 K26 K25 J24 K23 J23 K22",
+                "H23 J25 H24 J26 G26 H22 H26 H21",
+                "F23 D24 E23 D25 B26 B25 C26 D26"
+            ),
+            IOStandard("POD12_DCI")
+        ),
         Subsignal(
             "B_dqs_t",
             Pins("L18 M19 L22 L24 G24 F24 E25 D23"),
@@ -244,12 +255,12 @@ _io = [
             Pins("K18 L19 L23 L25 G25 F25 E26 C24"),
             IOStandard("DIFF_POD12_DCI")
         ),
-        Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21")),
-        Subsignal("B_dqsb_t", Pins("N23 R22"), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("B_dqsb_c", Pins("P23 R23"), IOStandard("DIFF_POD12_DCI")),
-        Subsignal("dlbdq",  Pins("U26")),
-        Subsignal("dlbdqs", Pins("V26")),
-        IOStandard("POD12_DCI"),
+        # Unused atthis point
+        # Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21"), IOStandard("POD12_DCI")),
+        # Subsignal("B_dqsb_t", Pins("N23 R22"), IOStandard("DIFF_POD12_DCI")),
+        # Subsignal("B_dqsb_c", Pins("P23 R23"), IOStandard("DIFF_POD12_DCI")),
+        # Subsignal("dlbdq",  Pins("U26"), IOStandard("POD12_DCI")),
+        # Subsignal("dlbdqs", Pins("V26"), IOStandard("POD12_DCI")),
         Misc("SLEW=FAST")
     )
     # TODO: Add I3C
@@ -312,8 +323,8 @@ class Platform(XilinxUSPPlatform):
         self.toolchain.additional_commands = \
             ["write_cfgmem -force -format bin -interface spix4 -size 16 "
              "-loadbit \"up 0x0 {build_name}.bit\" -file {build_name}.bin"]
-        self.toolchain.pre_placement_commands.add("set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets IBUF/O]") # Needed since RXC for ETH is not GC
-        self.toolchain.pre_placement_commands.add("set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports eth_tx_data[3]]")
+        self.add_platform_command("set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets IBUF/O]") # Needed since RXC for ETH is not GC
+        self.add_platform_command("set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports eth_tx_data[3]]")
 
     def pin_bank_byte_nibble_bitslice_mapping(self):
         return _io_bank
