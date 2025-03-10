@@ -202,16 +202,70 @@ _io = [
 
     # DDR
     ("ddr5", 0,
-        Subsignal("ck_t",  Pins("W25"),  IOStandard("DIFF_POD12_DCI")),
-        Subsignal("ck_c",  Pins("W26"),  IOStandard("DIFF_POD12_DCI")),
-        Subsignal("A_ca",  Pins("W23 V23 AA24 AA25 Y25 Y26 V24"), IOStandard("POD12_DCI")),
-        Subsignal("B_ca",  Pins("U25 R25 T25  P26  P25 P24 N24"), IOStandard("POD12_DCI")),
-        Subsignal("A_cs_n", Pins("Y22 Y23"), IOStandard("POD12_DCI")),
-        Subsignal("B_cs_n", Pins("T24 U24"), IOStandard("POD12_DCI")),
-        Subsignal("A_par", Pins("W24"), IOStandard("POD12_DCI")),
-        Subsignal("B_par", Pins("R26"), IOStandard("POD12_DCI")),
+        Subsignal(
+            "ck_t",
+            Pins("W25"),
+            IOStandard("DIFF_POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
+        Subsignal(
+            "ck_c",
+            Pins("W26"),
+            IOStandard("DIFF_POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
+        Subsignal(
+            "A_ca",
+            Pins("W23 V23 AA24 AA25 Y25 Y26 V24"),
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
+        Subsignal(
+            "B_ca",
+            Pins("U25 R25 T25  P26  P25 P24 N24"),
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
+        Subsignal(
+            "A_cs_n",
+            Pins("Y22 Y23"),
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
+        Subsignal(
+            "B_cs_n",
+            Pins("T24 U24"),
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
+        Subsignal(
+            "A_par",
+            Pins("W24"),
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
+        Subsignal(
+            "B_par",
+            Pins("R26"),
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
         Subsignal("alert_n", Pins("AA23"), IOStandard("POD12_DCI")),
-        Subsignal("reset_n", Pins("T19"), IOStandard("POD12_DCI")),
+        Subsignal(
+            "reset_n",
+            Pins("T19"),
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
+        ),
         #Subsignal("pgood",   Pins("N26"), IOStandard("POD12_DCI")), Unused at this point
         Subsignal("A_dq",
             Pins(
@@ -220,17 +274,23 @@ _io = [
                 "AD23 AE23 AC22 AC23 AD21 AE21 AB21 AC21",
                 "AB25 AF24 AB26 AF25 AD24 AC24 AD25 AB24"
             ),
-            IOStandard("POD12_DCI")
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
         ),
         Subsignal(
             "A_dqs_t",
             Pins("Y20  AB17 AD20 AC18 AE22 AA22 AE25 AC26"),
-            IOStandard("DIFF_POD12_DCI")
+            IOStandard("DIFF_POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
         ),
         Subsignal(
             "A_dqs_c",
             Pins("Y21  AC17 AE20 AD18 AF22 AB22 AE26 AD26"),
-            IOStandard("DIFF_POD12_DCI")
+            IOStandard("DIFF_POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
         ),
         # Unused at this point
         #Subsignal("A_cb",   Pins("U22 U21 T20 U20 T23 W20 T22 W19"), IOStandard("POD12_DCI")),
@@ -243,17 +303,23 @@ _io = [
                 "H23 J25 H24 J26 G26 H22 H26 H21",
                 "F23 D24 E23 D25 B26 B25 C26 D26"
             ),
-            IOStandard("POD12_DCI")
+            IOStandard("POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
         ),
         Subsignal(
             "B_dqs_t",
             Pins("L18 M19 L22 L24 G24 F24 E25 D23"),
-            IOStandard("DIFF_POD12_DCI")
+            IOStandard("DIFF_POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
         ),
         Subsignal(
             "B_dqs_c",
             Pins("K18 L19 L23 L25 G25 F25 E26 C24"),
-            IOStandard("DIFF_POD12_DCI")
+            IOStandard("DIFF_POD12_DCI"),
+            Misc("PRE_EMPHASIS=RDRV_240"),
+            Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
         ),
         # Unused atthis point
         # Subsignal("B_cb",   Pins("P19 N21 N22 N19 P20 R21 R20 P21"), IOStandard("POD12_DCI")),
@@ -261,7 +327,7 @@ _io = [
         # Subsignal("B_dqsb_c", Pins("P23 R23"), IOStandard("DIFF_POD12_DCI")),
         # Subsignal("dlbdq",  Pins("U26"), IOStandard("POD12_DCI")),
         # Subsignal("dlbdqs", Pins("V26"), IOStandard("POD12_DCI")),
-        Misc("SLEW=FAST")
+        Misc("SLEW=FAST"),
     )
     # TODO: Add I3C
 ]
