@@ -225,7 +225,7 @@ _io = [
         ),
         Subsignal(
             "B_ca",
-            Pins("U25 R25 T25  P26  P25 P24 N24"),
+            Pins("U25 T25 R25 P26 P25 P24 N24"),
             IOStandard("POD12_DCI"),
             Misc("PRE_EMPHASIS=RDRV_240"),
             Misc("OUTPUT_IMPEDANCE=RDRV_40_40"),
